@@ -1,8 +1,36 @@
+---
+output: pdf_document
+---
+# Data Type 
+*vector* 每个元素的mode（数据类型）要一致, 单个数字、字符串都是长度为 1 的向量.  
+*matrix* 是附带了两个属性的向量，行数和列数.  
+*list* 是不要求类型一致的 vector.  
+*data frame* 是list，这种list每个元素都是一个向量，对应于data frame的一个列, data frame和数据库里的表类似.  
 
-# data type 
-vector 每个元素的mode（数据类型）要一致
-单个数，单个字符串都是长度为 1 的向量vector
-matrix 是附带了两个属性的向量，行数和列数
-list 是不要求类型一致的 vector
-data frame是list，这种list每个元素都是一个向量，对应于data frame的一个列
-data frame和数据库里的表类似
+# 基础
+在交互环境下执行一个 R 文件  
+source("z.R")  
+在批处理环境下执行  
+R CMD BATCH z.R
+
+## 关于 Object-Oriented
+http://adv-r.had.co.nz/OO-essentials.html
+
+R 有三个 OO 系统和一个base type，所以有四套系统
+*S3* 是一种通用函数（generic function）OO, 这种面向对象系统不同于 Java, C++, C#等，这些是采用消息传递（message passing）的 OO 系统，也即是通过消息传递来调用方法（method）. S3 是通过一种特殊的函数，通用函数，来调用方法，这种 OO 系统比较随意，它没有类的形式定义（formal definition）.
+S3 系统是随着 base 包被分发的.
+message passing 的调用方式类似这样: canvas.drawRect("blue")
+而generic function 的调用方式类似这样: drawRect(canvas, "blue")
+
+关于 generic function，最早出现在 CLOS(Common Lisp Object System) 中，如下所述，来源[这里](http://www.gigamonkeys.com/book/object-reorientation-generic-functions.html)
+
+> Perhaps the biggest difference between a generic function-based system and a message-passing system is that methods don't belong to classes; they belong to the generic function, which is responsible for determining what method or methods to run in response to a particular invocation.
+
+*S4* 和 S3 类似，有两点不同，S4 有类的形式定义来描述类的表示和继承，S4 还有特殊的帮助函数用来定义通用函数和方法. S4 有多个代码分派(dispatch), 意味着通用函数可以调用任意参数的基于类的方法.
+S4 系统是随着 methods 包被分发的.
+
+
+*RC(Reference Classes)* 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect("blue"). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place
+
+*base types* 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.
+
