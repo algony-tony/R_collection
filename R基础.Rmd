@@ -1,0 +1,8 @@
+
+# data type 
+vector 每个元素的mode（数据类型）要一致
+单个数，单个字符串都是长度为 1 的向量vector
+matrix 是附带了两个属性的向量，行数和列数
+list 是不要求类型一致的 vector
+data frame是list，这种list每个元素都是一个向量，对应于data frame的一个列
+data frame和数据库里的表类似
