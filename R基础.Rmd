@@ -1,19 +1,197 @@
 ---
+title: "R基础"
 output: html_document
 ---
+
+# 基础
+在交互环境下执行一个 R 文件  
+```
+source("z.R")  
+```
+在批处理环境下执行  
+```
+R CMD BATCH z.R
+```
+
+## R 的启动
+R 每次启动都会先在执行目录下寻找 .Rprofile 文件, 而后在用户 home 目录下寻找该文件. 可以将每次启用要执行的命令放在该文件里.
+.Rdata 记录 session 所存下来的数据
+.Rhistory 记录 session 的命令历史
+
+启动 R 时用参数 vanilla 将不会加载任何配置文件(包含.Rprofile, .Rdata等)
+```
+R --vanilla
+```
+进一步查看  ?Startup
+
+## R 帮助文档
+特殊字符的帮助命令用双引号  ?"for"  ?"<"
+example() 函数会自动执行帮助文档最后的例子
+```
+example(seq)
+example(persp)
+```
+
+显示某个包的简短描述以及包中的函数名称和数据集名称的列表
+help(package="package_name")
+```
+help.search("search word")
+```
+
+查看运算符号优先级用:
+?Syntax
+
+## NA vs NULL
+在 R 中, **NA** 代表对象缺失(missing data), **NULL** 代表对象不存在(doesn't exist, rather than being existent but unknown).
+```{r}
+x <- c(1, NULL, 4)
+length(x)
+x <- c(1, NA, 4)
+length(x)
+```
+
+filter时用 subset() 将过滤 NA 值, which() 返回逻辑为 TRUE 的位置
+```{r}
+x <- c(6,1:3,NA,12)
+x[x>5]
+x[which(x>5)]
+subset(x,x>5)
+```
+
 # Data Type 
 **vector** 每个元素的mode（数据类型）要一致, 单个数字、字符串都是长度为 1 的向量.  
 **matrix** 是附带了两个属性的向量，行数和列数.  
 **list** 是不要求类型一致的 vector.  
 **data frame** 是list，这种list每个元素都是一个向量，对应于data frame的一个列, data frame和数据库里的表类似.  
 
-# 基础
-在交互环境下执行一个 R 文件  
-source("z.R")  
-在批处理环境下执行  
-R CMD BATCH z.R
+## vector
+R程序的 **向量化(vectorized)** 能极大提高效率.
 
-## 关于 Object-Oriented
+vector 对应于 C 中的数组 array, 没有insert, delete操作, vector 运算长度不够时, 它会自动 recycling.
+
+例:
+```{r}
+x <- c(88,5,12,13)
+x <- c(x[1:3],168,x[4])
+```
+本质上这里的 x 是一个指针 pointer, 第二步将 x 指向新地址.
+
+负号表示排除
+```
+x[-c(1,3)] 
+```
+
+若 y 没有事先生成, 直接如下面这样是会报错的, 这是因为 R 的函数是编程的特点, 关于向量元素的读写事实上是通过函数实现的, 若不事先知道 y 的类型, 该函数就无法操作.
+```
+y[1] <- 1
+```
+
+但是可以这样赋值
+```{r}
+y <- c(5,12)
+y <- vector(length=2)
+```
+
+2+3 也可以写成如下
+```{r}
+"+"(2,3)
+```
+
+all() 和 any() 函数判断 all/any 所有的参数都是 True
+```{r}
+x <- 1:10
+any(x>8)
+#上面会先产生这样的逻辑向量(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE), 然后返回 TRUE
+```
+
+判断两个向量是否相等
+```
+all(x==y)   #只判断值是否相等, 不检测类型
+```
+或者用 identical(x,y) 判断值和类型是否相等
+```{r identical}
+x <- 1:2
+typeof(x)
+y <- c(1,2)
+typeof(y)
+all(x==y)
+identical(x,y)
+```
+
+ifelse(test,yes,no) 是向量化的 if-then-else 函数, yes 和 no 是向量, test 是逻辑向量, 返回的也是向量.
+
+
+向量每个因素可以赋予名字
+```{r}
+x <- c(1,2,3)
+names(x) <- c("a","b","dad")
+# 删除向量的元素名字
+names(x) <- NULL
+```
+
+c() 函数有将向量扁平化的作用, 下面两个相等.
+```{r}
+c(1,2,c(3,4))
+c(1,2,3,4)
+```
+
+# 函数的使用
+
+## 函数：paste 
+作用：拼接字符串
+sep 是向量同位置的分隔符，collapse 是向量各分量的分隔符
+```{r paste}
+paste("AA", "BB", sep = ",")
+paste("AA", "BB", collapse = ",")
+
+paste("A", 1:6, sep = ",")
+paste("A", 1:6, collapse = ",")
+
+paste("A", 1:6, sep = "_", collapse = ",")
+  # 函数 paste0 比 paste 少sep 参数，据说效率会高一点
+paste0("A", 1:6, collapse = ",")
+```
+
+## 函数：diff
+作用：做差分
+这是一个 generic function, lag 表示移动几位做差值，differences表示将diff重复执行几次，所以下面两个式子等价
+```{r diff}
+diff(1:10, differences = 2)
+diff(diff(1:10))
+# 看函数自带的例子
+example("diff") 
+```
+
+## 函数：sub
+作用：替换
+```{r sub}
+gsub("a", "b", x) # 将 x 中的字符"a"都替换成字符"b"
+```
+
+## 函数: seq
+```{r seq}
+# 下面两个等价
+seq(1, 4)
+1:4
+```
+
+当 x 不是空向量时, 下面两个等价, 否则前者会执行两次, 而后者不会执行, 所以后面一种形式更好
+```{r seq adv}
+x <- c("a", "c")
+for(i in 1:length(x)){print("1")}
+for(i in seq(x)){print("1")}
+x <- c()
+for(i in 1:length(x)){print("1")}
+for(i in seq(x)){print("1")}
+```
+
+## 函数: repeat
+```{r rep}
+rep(1, 5)
+rep(c("a", "c"), 3)
+```
+
+# 关于 Object-Oriented
 http://adv-r.had.co.nz/OO-essentials.html
 
 R 有三个 OO 系统和一个base type，所以有四套系统
@@ -34,3 +212,5 @@ S4 系统是随着 methods 包被分发的.
 
 *base types* 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.
 
+参考:
+1. The Art of R Programming
