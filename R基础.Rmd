@@ -281,6 +281,46 @@ complete.case() 函数判断哪些行是完整的, 即不包含 NA 的行.
 
 在 data frame 中加入新列, 新加入向量长度过长会报错, 过短就 cycling.
 
+# Factor
+factor 想法来自于项或分类或统计上的变量(nominal, or categorical, variable in statistics), factor 可以简单的认为是向量加上了一个level的属性, level 包含了向量中不同值.
+```{r}
+x <- c(4,12,3,4)
+xf <- factor(x)
+str(xf)
+```
+这里 xf 的 level 有三个: level-1是3, level-2是4, level-3是12
+而 xf 实际存储的值是向量 (2,3,1,2), 这里1,2,3代表的就是level的值
+```{r}
+# 添加level
+xff <- factor(x,levels=c(3,4,12,13,88))
+xff
+```
+
+若在 factor中添加level中没有的值则会报错.
+```
+xff[2] <- 28
+```
+
+```
+# 将 x 按照list f 进行分组, 然后作用上函数 g
+tapply(x,f,g)
+
+# 将 x 按照 list f 进行分组, 相当于只做了一半的 tapply()
+split(x,f)
+
+# 很像 tapply() 函数, 但是 by() 是将每个分组分别作用函数输出结果
+by(x,f,g)
+
+#函数分组统计频度 contingency table
+table()
+
+#得到各维度的名字
+dimnames()
+```
+
+#调用函数, 第一个参数函数名, 第二个参数是list, 其中每个元素是要传给执行函数的参数
+do.call(fun,arg)    
+
 # 函数的使用
 
 ## 函数：paste 
