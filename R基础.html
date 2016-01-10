@@ -112,7 +112,7 @@ x[x&gt;5]</code></pre>
 <h1>Data Type</h1>
 <p><strong>vector</strong> 每个元素的mode（数据类型）要一致, 单个数字、字符串都是长度为 1 的向量.<br /><strong>matrix</strong> 是附带了两个属性的向量，行数和列数.<br /><strong>list</strong> 是不要求类型一致的 vector.<br /><strong>data frame</strong> 是list，这种list每个元素都是一个向量，对应于data frame的一个列, data frame和数据库里的表类似.</p>
 <div id="vector" class="section level2">
-<h2>vector</h2>
+<h2>Vector</h2>
 <p>R程序的 <strong>向量化(vectorized)</strong> 能极大提高效率.</p>
 <p>vector 对应于 C 中的数组 array, 没有insert, delete操作, vector 运算长度不够时, 它会自动 recycling.</p>
 <p>例:</p>
@@ -281,6 +281,122 @@ colnames(y)</code></pre>
 <pre><code>## [1] &quot;c1&quot; &quot;c2&quot;</code></pre>
 <pre class="r"><code>rownames(y)</code></pre>
 <pre><code>## [1] &quot;r1&quot; &quot;r2&quot;</code></pre>
+</div>
+<div id="list" class="section level1">
+<h1>List</h1>
+<p>list 其实也是 vector, 是 recursive vector, 嵌套的vector.</p>
+<pre class="r"><code>j &lt;- list(name=&quot;Joe&quot;, salary=55000, union=T)
+j</code></pre>
+<pre><code>## $name
+## [1] &quot;Joe&quot;
+## 
+## $salary
+## [1] 55000
+## 
+## $union
+## [1] TRUE</code></pre>
+<pre class="r"><code>z &lt;- vector(mode=&quot;list&quot;)
+z[[&quot;abc&quot;]] &lt;- 3
+z</code></pre>
+<pre><code>## $abc
+## [1] 3</code></pre>
+<p>list 的每个分支component 在 R 里叫 tag, 引用 list 的 tag 有三种方式</p>
+<pre class="r"><code>j$salary</code></pre>
+<pre><code>## [1] 55000</code></pre>
+<pre class="r"><code>j[[&quot;salary&quot;]]</code></pre>
+<pre><code>## [1] 55000</code></pre>
+<pre class="r"><code>j[[2]]</code></pre>
+<pre><code>## [1] 55000</code></pre>
+<p>用单方括号引用的方式得到的是子 list</p>
+<pre class="r"><code>class(j[1:2])</code></pre>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<pre class="r"><code>class(j[1])</code></pre>
+<pre><code>## [1] &quot;list&quot;</code></pre>
+<p>list 加分支方式</p>
+<pre class="r"><code>z$a &lt;- 23
+z[[4]] &lt;- 28
+z[5:7] &lt;- c(FALSE,TRUE,TRUE)
+z</code></pre>
+<pre><code>## $abc
+## [1] 3
+## 
+## $a
+## [1] 23
+## 
+## [[3]]
+## NULL
+## 
+## [[4]]
+## [1] 28
+## 
+## [[5]]
+## [1] FALSE
+## 
+## [[6]]
+## [1] TRUE
+## 
+## [[7]]
+## [1] TRUE</code></pre>
+<pre class="r"><code>c(list(&quot;Joe&quot;, 55000, T),list(5))</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;Joe&quot;
+## 
+## [[2]]
+## [1] 55000
+## 
+## [[3]]
+## [1] TRUE
+## 
+## [[4]]
+## [1] 5</code></pre>
+<pre class="r"><code>#返回 list 的tags
+names(z)</code></pre>
+<pre><code>## [1] &quot;abc&quot; &quot;a&quot;   &quot;&quot;    &quot;&quot;    &quot;&quot;    &quot;&quot;    &quot;&quot;</code></pre>
+<pre class="r"><code>#返回向量, 将原list的name转换为向量的name
+unlist(z)</code></pre>
+<pre><code>## abc   a                 
+##   3  23  28   0   1   1</code></pre>
+<pre class="r"><code># 下面这两个不一样
+# 这个得到的是 recrusive list
+c(list(a=1,b=2,c=list(d=5,e=9)))</code></pre>
+<pre><code>## $a
+## [1] 1
+## 
+## $b
+## [1] 2
+## 
+## $c
+## $c$d
+## [1] 5
+## 
+## $c$e
+## [1] 9</code></pre>
+<pre class="r"><code># 这个得到的是vector
+c(list(a=1,b=2,c=list(d=5,e=9)),recursive=T)</code></pre>
+<pre><code>##   a   b c.d c.e 
+##   1   2   5   9</code></pre>
+</div>
+<div id="data-frame" class="section level1">
+<h1>Data Frame</h1>
+<p>data frame 是一个 list, 该 list 每个分支都是长度相同的向量. 事实上, R 允许 data frame 的分支是其他类型, 甚至是 data frame, 这种情形极少使用.</p>
+<pre class="r"><code>df &lt;- as.data.frame(list(sname=c(&quot;n1&quot;,&quot;n2&quot;,&quot;n3&quot;), kv=c(6,8,10)))
+df</code></pre>
+<pre><code>##   sname kv
+## 1    n1  6
+## 2    n2  8
+## 3    n3 10</code></pre>
+<pre class="r"><code>class(df)</code></pre>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<pre class="r"><code>df[df$kv &gt;= 8,]</code></pre>
+<pre><code>##   sname kv
+## 2    n2  8
+## 3    n3 10</code></pre>
+<pre class="r"><code>subset(df,kv &gt;= 8)</code></pre>
+<pre><code>##   sname kv
+## 2    n2  8
+## 3    n3 10</code></pre>
+<p>complete.case() 函数判断哪些行是完整的, 即不包含 NA 的行.</p>
+<p>在 data frame 中加入新列, 新加入向量长度过长会报错, 过短就 cycling.</p>
 </div>
 <div class="section level1">
 <h1>函数的使用</h1>

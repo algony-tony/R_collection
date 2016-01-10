@@ -71,7 +71,7 @@ subset(x,x>5)
 **list** 是不要求类型一致的 vector.  
 **data frame** 是list，这种list每个元素都是一个向量，对应于data frame的一个列, data frame和数据库里的表类似.  
 
-## vector
+## Vector
 R程序的 **向量化(vectorized)** 能极大提高效率.
 
 vector 对应于 C 中的数组 array, 没有insert, delete操作, vector 运算长度不够时, 它会自动 recycling.
@@ -221,6 +221,65 @@ rownames(y) <- c("r1", "r2")
 colnames(y)
 rownames(y)
 ```
+
+# List
+list 其实也是 vector, 是 recursive vector, 嵌套的vector.
+```{r}
+j <- list(name="Joe", salary=55000, union=T)
+j
+z <- vector(mode="list")
+z[["abc"]] <- 3
+z
+```
+
+list 的每个分支component 在 R 里叫 tag, 引用 list 的 tag 有三种方式
+```{r}
+j$salary
+j[["salary"]]
+j[[2]]
+```
+
+用单方括号引用的方式得到的是子 list
+```{r}
+class(j[1:2])
+class(j[1])
+```
+
+list 加分支方式
+```{r}
+z$a <- 23
+z[[4]] <- 28
+z[5:7] <- c(FALSE,TRUE,TRUE)
+z
+c(list("Joe", 55000, T),list(5))
+
+#返回 list 的tags
+names(z)
+#返回向量, 将原list的name转换为向量的name
+unlist(z)
+
+# 下面这两个不一样
+# 这个得到的是 recrusive list
+c(list(a=1,b=2,c=list(d=5,e=9)))
+# 这个得到的是vector
+c(list(a=1,b=2,c=list(d=5,e=9)),recursive=T)
+```
+
+# Data Frame
+data frame 是一个 list, 该 list 每个分支都是长度相同的向量.
+事实上, R 允许 data frame 的分支是其他类型, 甚至是 data frame, 这种情形极少使用.
+
+```{r}
+df <- as.data.frame(list(sname=c("n1","n2","n3"), kv=c(6,8,10)))
+df
+class(df)
+df[df$kv >= 8,]
+subset(df,kv >= 8)
+```
+
+complete.case() 函数判断哪些行是完整的, 即不包含 NA 的行.
+
+在 data frame 中加入新列, 新加入向量长度过长会报错, 过短就 cycling.
 
 # 函数的使用
 
