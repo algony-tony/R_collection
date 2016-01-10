@@ -23,6 +23,8 @@ R操作的都是对象object，当前所存储的对象的集合叫做工作区w
 class() 查看对象的类名;
 attributes() 查看对象的所有属性值;
 
+require() 在函数内使用，当包未找到是报出warning，并继续执行，而library() 则会抛出error.
+
 启动 R 时用参数 vanilla 将不会加载任何配置文件(包含.Rprofile, .Rdata等)
 ```
 R --vanilla
@@ -171,6 +173,30 @@ cbind(y,y)
 rbind(y,y)
 
 dim(y)
+
+# 矩阵乘法, 下面两个表达式结果相等, 但是用crossprod函数更高效
+crossprod(y,y)
+t(y) %*% y
+
+# 取对角线元素
+diag(y)
+
+# k阶单位矩阵
+diag(5)
+
+# 计算特征值和特征向量
+eigen(y)
+
+# 对于大型矩阵只需要计算特征值的时候可以加参数
+eigen(y, only.values = T)$values
+
+# 计算矩阵的逆
+solve(y)
+
+x <- 9:10
+# 当需要计算 A^{-1} %*% x 时, 使用下面的形式更高效和稳定
+solve(y, x)
+
 ```
 
 在 R 里, 对矩阵只取一行或者一列后得到的是一个向量, 而不是一个矩阵,它会自动做一个维度约化(dimension reduction), 使用 drop=FALSE 可以强制不做维度约化.

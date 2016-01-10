@@ -75,6 +75,7 @@ img {
 <h2>R 的启动</h2>
 <p>R 每次启动都会先在执行目录下寻找 .Rprofile 文件, 而后在用户 home 目录下寻找该文件. 可以将每次启用要执行的命令放在该文件里. .Rdata 记录 session 所存下来的数据; .Rhistory 记录 session 的命令历史; R操作的都是对象object，当前所存储的对象的集合叫做工作区workspace.</p>
 <p>class() 查看对象的类名; attributes() 查看对象的所有属性值;</p>
+<p>require() 在函数内使用，当包未找到是报出warning，并继续执行，而library() 则会抛出error.</p>
 <p>启动 R 时用参数 vanilla 将不会加载任何配置文件(包含.Rprofile, .Rdata等)</p>
 <pre><code>R --vanilla</code></pre>
 <p>进一步查看 ?Startup</p>
@@ -218,6 +219,47 @@ cbind(y,y)</code></pre>
 ## [4,]    3    4</code></pre>
 <pre class="r"><code>dim(y)</code></pre>
 <pre><code>## [1] 2 2</code></pre>
+<pre class="r"><code># 矩阵乘法, 下面两个表达式结果相等, 但是用crossprod函数更高效
+crossprod(y,y)</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]   10   14
+## [2,]   14   20</code></pre>
+<pre class="r"><code>t(y) %*% y</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,]   10   14
+## [2,]   14   20</code></pre>
+<pre class="r"><code># 取对角线元素
+diag(y)</code></pre>
+<pre><code>## [1] 1 4</code></pre>
+<pre class="r"><code># k阶单位矩阵
+diag(5)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    0    0    0
+## [2,]    0    1    0    0    0
+## [3,]    0    0    1    0    0
+## [4,]    0    0    0    1    0
+## [5,]    0    0    0    0    1</code></pre>
+<pre class="r"><code># 计算特征值和特征向量
+eigen(y)</code></pre>
+<pre><code>## $values
+## [1]  5.3722813 -0.3722813
+## 
+## $vectors
+##            [,1]       [,2]
+## [1,] -0.4159736 -0.8245648
+## [2,] -0.9093767  0.5657675</code></pre>
+<pre class="r"><code># 对于大型矩阵只需要计算特征值的时候可以加参数
+eigen(y, only.values = T)$values</code></pre>
+<pre><code>## [1]  5.3722813 -0.3722813</code></pre>
+<pre class="r"><code># 计算矩阵的逆
+solve(y)</code></pre>
+<pre><code>##      [,1] [,2]
+## [1,] -2.0  1.0
+## [2,]  1.5 -0.5</code></pre>
+<pre class="r"><code>x &lt;- 9:10
+# 当需要计算 A^{-1} %*% x 时, 使用下面的形式更高效和稳定
+solve(y, x)</code></pre>
+<pre><code>## [1] -8.0  8.5</code></pre>
 <p>在 R 里, 对矩阵只取一行或者一列后得到的是一个向量, 而不是一个矩阵,它会自动做一个维度约化(dimension reduction), 使用 drop=FALSE 可以强制不做维度约化.</p>
 <pre class="r"><code>y &lt;- matrix(c(1:4), nrow=2, ncol=2, byrow=TRUE)
 class(y[1,])</code></pre>
