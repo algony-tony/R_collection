@@ -70,7 +70,7 @@ img {
 <pre><code>source(&quot;z.R&quot;)  </code></pre>
 <p>在批处理环境下执行</p>
 <pre><code>R CMD BATCH z.R</code></pre>
-<p>将原本在终端输出的结果转存到文件record.lis中 sink(“record.lis”)，重新将结果输出到终端 sink().</p>
+<p>将原本在终端输出的结果转存到文件 record.lis 中用 sink(“record.lis”)，重新将结果输出到终端用 sink().</p>
 <div id="r-" class="section level2">
 <h2>R 的启动</h2>
 <p>R 每次启动都会先在执行目录下寻找 .Rprofile 文件, 而后在用户 home 目录下寻找该文件. 可以将每次启用要执行的命令放在该文件里. .Rdata 记录 session 所存下来的数据; .Rhistory 记录 session 的命令历史; R操作的都是对象object，当前所存储的对象的集合叫做工作区workspace.</p>
@@ -78,11 +78,12 @@ img {
 <p>require() 在函数内使用，当包未找到是报出warning，并继续执行，而library() 则会抛出error.</p>
 <p>启动 R 时用参数 vanilla 将不会加载任何配置文件(包含.Rprofile, .Rdata等)</p>
 <pre><code>R --vanilla</code></pre>
-<p>进一步查看 ?Startup</p>
+<p>进一步查看使用命令 ?Startup</p>
 </div>
 <div id="r-" class="section level2">
 <h2>R 帮助文档</h2>
-<p>特殊字符的帮助命令用双引号 ?“for” ?“&lt;” example() 函数会自动执行帮助文档最后的例子</p>
+<p>特殊字符的帮助命令用双引号 ?“for” ?“&lt;”</p>
+<p>example() 函数会自动执行帮助文档最后的例子</p>
 <pre><code>example(seq)
 example(persp)</code></pre>
 <p>显示某个包的简短描述以及包中的函数名称和数据集名称的列表 help(package=“package_name”)</p>
@@ -426,11 +427,43 @@ by(x,f,g)
 table()
 
 #得到各维度的名字
-dimnames()</code></pre>
+dimnames()
+
+# 调用函数, 第一个参数函数名, 第二个参数是list, 其中每个元素是要传给执行函数的参数
+do.call(fun,arg)    </code></pre>
 </div>
-<div id="--list-" class="section level1">
-<h1>调用函数, 第一个参数函数名, 第二个参数是list, 其中每个元素是要传给执行函数的参数</h1>
-<p>do.call(fun,arg)</p>
+<div id="r-" class="section level1">
+<h1>R 程序结构</h1>
+<p>for(fn in vec) 循环不直接支持非向量的循环. get(objectname) 得到名字为 object_name 的对象, 可用于循环中.</p>
+<p>有种说法不应用 return() 函数, 因为会执行慢.</p>
+<p>R 中函数是 first-class objects.</p>
+<p>“{” 也是一个函数.</p>
+<p>formal(fun) body(fun) #分别返回函数的参数和主体</p>
+<p>page(fun) #在页面打开显示函数内容</p>
+<p>edit(fun) #在新页面编辑函数内容</p>
+<p>更改函数主体, 因为主体的类是 call, 所以要用 quote 函数.</p>
+<pre class="r"><code>g &lt;- function(h,a,b) h(a,b)
+body(g) &lt;- quote(2 * x + 3)
+g</code></pre>
+<pre><code>## function (h, a, b) 
+## 2 * x + 3</code></pre>
+<p>“&lt;&lt;-” 是 superassignment, 或者用 assign(varname,value,pos=.GlobalEnv) 函数指定到顶层变量.</p>
+<p>closure 包含函数的参数和主体以及他的执行环境(with its environment at the time of the call).</p>
+<p>这行命令奇怪的地方在于将值赋给一个函数的返回值</p>
+<pre class="r"><code>names(x) &lt;- c(&quot;a&quot;,&quot;b&quot;,&quot;ab&quot;)  
+x</code></pre>
+<pre><code>##    a    b   ab &lt;NA&gt; 
+##    4   12    3    4</code></pre>
+<p>其实它真正调用的是这个函数</p>
+<pre class="r"><code>x &lt;- &quot;names&lt;-&quot;(x,value=c(&quot;a&quot;,&quot;b&quot;,&quot;ab&quot;))
+x</code></pre>
+<pre><code>##    a    b   ab &lt;NA&gt; 
+##    4   12    3    4</code></pre>
+<p>这被称为替换函数(replacement functions), 任何赋值左端的不是一个变量名(限定符 identifier)的情况 R 都会把它当成是替换函数, 如 R 碰到这样的命令 g(u) &lt;- v 那么它会尝试去执行 u &lt;- “g&lt;-”(u,value=v) 这样连 x[3] &lt;- 8 这样的命令其实也都是替换函数在起作用.</p>
+<p>定义自己的二元运算符必须以百分号 % 开头和结尾</p>
+<pre class="r"><code>&quot;%a2b%&quot; &lt;- function(a,b) return(a+2 * b)
+3 %a2b% 5</code></pre>
+<pre><code>## [1] 13</code></pre>
 </div>
 <div class="section level1">
 <h1>函数的使用</h1>
@@ -523,9 +556,323 @@ for(i in 1:length(x)){print(&quot;1&quot;)}</code></pre>
 <blockquote>
 <p>Perhaps the biggest difference between a generic function-based system and a message-passing system is that methods don’t belong to classes; they belong to the generic function, which is responsible for determining what method or methods to run in response to a particular invocation.</p>
 </blockquote>
+<p>S3 本质上就是由 list 组成的, 带上类的属性, 并且有分发的能力.</p>
+<blockquote>
+<p>An S3 class consists of a list, with a class name attribute and dispatch capability added. The latter enables the use of generic functions. S4 classes were developed later, with goal of adding safety, meaning that you cannot accidentally access a class component that is not already in existence.</p>
+</blockquote>
 <p><em>S4</em> 和 S3 类似，有两点不同，S4 有类的形式定义来描述类的表示和继承，S4 还有特殊的帮助函数用来定义通用函数和方法. S4 有多个代码分派(dispatch), 意味着通用函数可以调用任意参数的基于类的方法. S4 系统是随着 methods 包被分发的.</p>
+<p>print() 函数就是一个 generic fucntion.</p>
+<pre class="r"><code># 查看 generic function 的所有实现(implementations)
+methods(print)</code></pre>
+<pre><code>##   [1] print.acf*                                   
+##   [2] print.AES*                                   
+##   [3] print.anova*                                 
+##   [4] print.aov*                                   
+##   [5] print.aovlist*                               
+##   [6] print.ar*                                    
+##   [7] print.Arima*                                 
+##   [8] print.arima0*                                
+##   [9] print.AsIs                                   
+##  [10] print.aspell*                                
+##  [11] print.aspell_inspect_context*                
+##  [12] print.bibentry*                              
+##  [13] print.Bibtex*                                
+##  [14] print.browseVignettes*                       
+##  [15] print.by                                     
+##  [16] print.changedFiles*                          
+##  [17] print.check_code_usage_in_package*           
+##  [18] print.check_compiled_code*                   
+##  [19] print.check_demo_index*                      
+##  [20] print.check_depdef*                          
+##  [21] print.check_dotInternal*                     
+##  [22] print.check_make_vars*                       
+##  [23] print.check_nonAPI_calls*                    
+##  [24] print.check_package_code_assign_to_globalenv*
+##  [25] print.check_package_code_attach*             
+##  [26] print.check_package_code_data_into_globalenv*
+##  [27] print.check_package_code_startup_functions*  
+##  [28] print.check_package_code_syntax*             
+##  [29] print.check_package_code_unload_functions*   
+##  [30] print.check_package_compact_datasets*        
+##  [31] print.check_package_CRAN_incoming*           
+##  [32] print.check_package_datasets*                
+##  [33] print.check_package_depends*                 
+##  [34] print.check_package_description*             
+##  [35] print.check_package_description_encoding*    
+##  [36] print.check_package_license*                 
+##  [37] print.check_packages_in_dir*                 
+##  [38] print.check_packages_in_dir_changes*         
+##  [39] print.check_packages_used*                   
+##  [40] print.check_po_files*                        
+##  [41] print.check_Rd_contents*                     
+##  [42] print.check_Rd_line_widths*                  
+##  [43] print.check_Rd_metadata*                     
+##  [44] print.check_Rd_xrefs*                        
+##  [45] print.check_so_symbols*                      
+##  [46] print.check_T_and_F*                         
+##  [47] print.check_url_db*                          
+##  [48] print.check_vignette_index*                  
+##  [49] print.checkDocFiles*                         
+##  [50] print.checkDocStyle*                         
+##  [51] print.checkFF*                               
+##  [52] print.checkRd*                               
+##  [53] print.checkReplaceFuns*                      
+##  [54] print.checkS3methods*                        
+##  [55] print.checkTnF*                              
+##  [56] print.checkVignettes*                        
+##  [57] print.citation*                              
+##  [58] print.codoc*                                 
+##  [59] print.codocClasses*                          
+##  [60] print.codocData*                             
+##  [61] print.colorConverter*                        
+##  [62] print.compactPDF*                            
+##  [63] print.condition                              
+##  [64] print.connection                             
+##  [65] print.data.frame                             
+##  [66] print.Date                                   
+##  [67] print.default                                
+##  [68] print.dendrogram*                            
+##  [69] print.density*                               
+##  [70] print.difftime                               
+##  [71] print.dist*                                  
+##  [72] print.Dlist                                  
+##  [73] print.DLLInfo                                
+##  [74] print.DLLInfoList                            
+##  [75] print.DLLRegisteredRoutines                  
+##  [76] print.dummy_coef*                            
+##  [77] print.dummy_coef_list*                       
+##  [78] print.ecdf*                                  
+##  [79] print.factanal*                              
+##  [80] print.factor                                 
+##  [81] print.family*                                
+##  [82] print.fileSnapshot*                          
+##  [83] print.findLineNumResult*                     
+##  [84] print.formula*                               
+##  [85] print.fseq*                                  
+##  [86] print.ftable*                                
+##  [87] print.function                               
+##  [88] print.getAnywhere*                           
+##  [89] print.glm*                                   
+##  [90] print.hclust*                                
+##  [91] print.help_files_with_topic*                 
+##  [92] print.hexmode                                
+##  [93] print.HoltWinters*                           
+##  [94] print.hsearch*                               
+##  [95] print.hsearch_db*                            
+##  [96] print.htest*                                 
+##  [97] print.html*                                  
+##  [98] print.infl*                                  
+##  [99] print.integrate*                             
+## [100] print.isoreg*                                
+## [101] print.kmeans*                                
+## [102] print.knitr_kable*                           
+## [103] print.Latex*                                 
+## [104] print.LaTeX*                                 
+## [105] print.libraryIQR                             
+## [106] print.listof                                 
+## [107] print.lm*                                    
+## [108] print.loadings*                              
+## [109] print.loess*                                 
+## [110] print.logLik*                                
+## [111] print.ls_str*                                
+## [112] print.medpolish*                             
+## [113] print.MethodsFunction*                       
+## [114] print.mtable*                                
+## [115] print.NativeRoutineList                      
+## [116] print.news_db*                               
+## [117] print.nls*                                   
+## [118] print.noquote                                
+## [119] print.numeric_version                        
+## [120] print.object_size*                           
+## [121] print.octmode                                
+## [122] print.packageDescription*                    
+## [123] print.packageInfo                            
+## [124] print.packageIQR*                            
+## [125] print.packageStatus*                         
+## [126] print.pairwise.htest*                        
+## [127] print.PDF_Array*                             
+## [128] print.PDF_Dictionary*                        
+## [129] print.pdf_doc*                               
+## [130] print.pdf_fonts*                             
+## [131] print.PDF_Indirect_Reference*                
+## [132] print.pdf_info*                              
+## [133] print.PDF_Keyword*                           
+## [134] print.PDF_Name*                              
+## [135] print.PDF_Stream*                            
+## [136] print.PDF_String*                            
+## [137] print.person*                                
+## [138] print.POSIXct                                
+## [139] print.POSIXlt                                
+## [140] print.power.htest*                           
+## [141] print.ppr*                                   
+## [142] print.prcomp*                                
+## [143] print.princomp*                              
+## [144] print.proc_time                              
+## [145] print.raster*                                
+## [146] print.Rd*                                    
+## [147] print.recordedplot*                          
+## [148] print.restart                                
+## [149] print.RGBcolorConverter*                     
+## [150] print.rle                                    
+## [151] print.roman*                                 
+## [152] print.sessionInfo*                           
+## [153] print.shiny.tag*                             
+## [154] print.shiny.tag.list*                        
+## [155] print.simple.list                            
+## [156] print.smooth.spline*                         
+## [157] print.socket*                                
+## [158] print.srcfile                                
+## [159] print.srcref                                 
+## [160] print.stepfun*                               
+## [161] print.stl*                                   
+## [162] print.StructTS*                              
+## [163] print.subdir_tests*                          
+## [164] print.summarize_CRAN_check_status*           
+## [165] print.summary.aov*                           
+## [166] print.summary.aovlist*                       
+## [167] print.summary.ecdf*                          
+## [168] print.summary.glm*                           
+## [169] print.summary.lm*                            
+## [170] print.summary.loess*                         
+## [171] print.summary.manova*                        
+## [172] print.summary.nls*                           
+## [173] print.summary.packageStatus*                 
+## [174] print.summary.ppr*                           
+## [175] print.summary.prcomp*                        
+## [176] print.summary.princomp*                      
+## [177] print.summary.table                          
+## [178] print.summaryDefault                         
+## [179] print.table                                  
+## [180] print.tables_aov*                            
+## [181] print.terms*                                 
+## [182] print.ts*                                    
+## [183] print.tskernel*                              
+## [184] print.TukeyHSD*                              
+## [185] print.tukeyline*                             
+## [186] print.tukeysmooth*                           
+## [187] print.undoc*                                 
+## [188] print.vignette*                              
+## [189] print.warnings                               
+## [190] print.xgettext*                              
+## [191] print.xngettext*                             
+## [192] print.xtabs*                                 
+## see '?methods' for accessing help and source code</code></pre>
+<p>得到的结果中有类似 print.aspell* 这样带星号的实现, 表明它是不可见的函数(nonvisible functions), 即它不在默认的命名空间(namespace)中, 这时可以用如下函数来得到该函数所在的命名空间 utils, 引用方式为 utils:::print.aspell(aspout)</p>
+<pre class="r"><code>getAnywhere(print.aspell) </code></pre>
+<pre><code>## A single object matching 'print.aspell' was found
+## It was found in the following places
+##   registered S3 method for print from namespace utils
+##   namespace:utils
+## with value
+## 
+## function (x, ...) 
+## {
+##     if (nrow(x)) 
+##         writeLines(paste(format(x, ...), collapse = &quot;\n\n&quot;))
+##     invisible(x)
+## }
+## &lt;bytecode: 0x3ee2e30&gt;
+## &lt;environment: namespace:utils&gt;</code></pre>
 <p><em>RC(Reference Classes)</em> 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect(“blue”). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place</p>
 <p><em>base types</em> 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.</p>
+<p>S3 和 S4 基础操作的一些区别</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Operation</th>
+<th align="left">S3</th>
+<th align="left">S4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Define class</td>
+<td align="left">Implicit in constructor code</td>
+<td align="left">setClass()</td>
+</tr>
+<tr class="even">
+<td align="left">Create object</td>
+<td align="left">Build list, set class attr</td>
+<td align="left">new()</td>
+</tr>
+<tr class="odd">
+<td align="left">Reference member variable</td>
+<td align="left">$</td>
+<td align="left">@</td>
+</tr>
+<tr class="even">
+<td align="left">Implement generic f()</td>
+<td align="left">Define f.classname()</td>
+<td align="left">setMethod()</td>
+</tr>
+<tr class="odd">
+<td align="left">Declare generic</td>
+<td align="left">UseMethod()</td>
+<td align="left">setGeneric()</td>
+</tr>
+</tbody>
+</table>
+<p>构建 S3 类</p>
+<pre class="r"><code>j &lt;- list(name=&quot;Joe&quot;, salary=55000, union=T)
+# 构建了一个 employee 类
+class(j) &lt;- &quot;employee&quot;
+
+# 生成 employee 的一个generic function
+print.employee &lt;- function(wrkr) {
+  cat(wrkr$name,&quot;\n&quot;)
+  cat(&quot;salary&quot;,wrkr$salary,&quot;\n&quot;)
+  cat(&quot;union member&quot;,wrkr$union,&quot;\n&quot;)
+}
+
+print(j)</code></pre>
+<pre><code>## Joe 
+## salary 55000 
+## union member TRUE</code></pre>
+<pre class="r"><code>k &lt;- list(name=&quot;Kate&quot;, salary= 68000, union=F, hrsthismonth= 2)
+# 类的继承, hrlyemployee 是 employee 的子类
+class(k) &lt;- c(&quot;hrlyemployee&quot;,&quot;employee&quot;)
+
+print(k)</code></pre>
+<pre><code>## Kate 
+## salary 68000 
+## union member FALSE</code></pre>
+<p>构建 S4 类</p>
+<pre class="r"><code># 构建了一个 employee 类
+setClass(&quot;employee&quot;,
+  representation(
+  name=&quot;character&quot;,
+  salary=&quot;numeric&quot;,
+  union=&quot;logical&quot;)
+)
+
+joe &lt;- new(&quot;employee&quot;,name=&quot;Joe&quot;,salary=55000,union=T)
+joe@salary</code></pre>
+<pre><code>## [1] 55000</code></pre>
+<pre class="r"><code>#效果和 joe@salary 一样
+slot(joe,&quot;salary&quot;)</code></pre>
+<pre><code>## [1] 55000</code></pre>
+<pre class="r"><code># construct generic function show()
+setMethod(&quot;show&quot;, &quot;employee&quot;,
+function(object) {
+  inorout &lt;- ifelse(object@union,&quot;is&quot;,&quot;is not&quot;)
+  cat(object@name,&quot;has a salary of&quot;,object@salary,
+      &quot;and&quot;,inorout, &quot;in the union&quot;, &quot;\n&quot;)
+  }
+)</code></pre>
+<pre><code>## [1] &quot;show&quot;</code></pre>
+<pre class="r"><code>show(joe)</code></pre>
+<pre><code>## Joe has a salary of 55000 and is in the union</code></pre>
+<p>John Chambers, the creator of the S language and one of the central developers of R, recommends S4 over S3 in his book Software for Data Anal- ysis (Springer, 2008). He argues that S4 is needed in order to write “clear and reliable software.” On the other hand, he notes that S3 remains quite popular.</p>
+<p>Google’s R Style Guide, which you can find at <a href="http://google-styleguide.googlecode.com/svn/trunk/google-r-style.html">this</a>, is interesting in this regard. Google comes down squarely on the S3 side, stating “avoid S4 objects and methods when possible.”</p>
+<p>关于对象处理的一些函数</p>
+<pre><code>ls()
+rm()
+save()
+exists()
+class(), mode()
+names(), attributes()
+unclass(), str()
+edit()</code></pre>
 <p>参考: 1. The Art of R Programming</p>
 </div>
 
