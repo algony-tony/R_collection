@@ -73,7 +73,7 @@ subset(x,x>5)
 **data frame** 是list，这种list每个元素都是一个向量，对应于data frame的一个列, data frame和数据库里的表类似.  
 
 ## Vector
-R程序的 **向量化(vectorized)** 能极大提高效率.
+R程序的 **向量化(vectorized)** 能极大提高效率, 向量化就是尽量转换成对向量进行操作, 少使用循环.
 
 vector 对应于 C 中的数组 array, 没有insert, delete操作, vector 运算长度不够时, 它会自动 recycling.
 
@@ -426,6 +426,18 @@ rep(1, 5)
 rep(c("a", "c"), 3)
 ```
 
+## 字符串处理函数
+```{r string}
+grep("^[0-9]{3}","9865T6RDW")
+# 返回字符串长度
+nchar("string")
+# 打印字符串
+i <- 10; sprintf("the square of %d is %d",i,i^2)
+# 截取字符串
+substr("abcdefg",3,5)
+strsplit("6-16-2011",split="-")
+```
+
 ## I/O 函数
 
 scan() 可以从文件或者终端上读入内容, 不带 what 默认使用数字和double类型, 如果是字符串就需要指定 what="", scan("filename",what=""), 直接用 scan("") 则从键盘输入.
@@ -465,6 +477,54 @@ read.table() 和 scan() 函数可以接收网址为参数.
 * socketConnection() : This establishes an R connection via sockets. You specify the port number in the argument port , and state whether a server or client is to be created, by setting the argument server to TRUE or FALSE , respectively. In the client case, you must also supply the server’s IP address in the argument host .
 * socketSelect() : This is useful when a server is connected to multiple clients. Its main argument, socklist , is a list of connections, and its return value is the sublist of connections that have data ready for the server to read.
 
+# R 的性能
+R is an interpreted language, 会话中的对象都存储在内存中, 
+
+write R code faster: 
+
+* 通过向量化 vectorization, 用字节码use of byte-code compilation, and other approaches
+* 把核心的, 高CPU使用的代码部分用 C/C++ 实现
+* 并行parallel
+
+apply 是用R实现的不是用C
+Though apply() eliminates an explicit loop, it is actually implemented in
+R rather than C and thus will usually not speed up your code. However, the
+other apply functions, such as lapply() , can be very helpful in speeding up
+your code.
+
+tracemem()  追踪记录对象的内存地址.
+
+**copy-on-change** 一开始 y 和 z 共享一个内存地址, 如果有一个值发生变化, 则复制到新地址重新赋值.
+```{r}
+z <- runif(10)
+z
+tracemem(z)
+y <- z
+tracemem(z)
+tracemem(y)
+y[3] <- 8
+tracemem(z)
+tracemem(y)
+untracemem(z)
+untracemem(y)
+```
+
+R 内部的内存复制是通过调用 duplicate() 函数来实现的(新版的R叫duplicate1()).
+
+Rprof() , which gives you a report of (approximately) how much time your code is spending in each of the functions it calls.
+
+Starting with version 2.13, R has included a byte code compiler, which you can use to try to speed up your code.
+```{r}
+library(compiler)
+f <- function() for (i in 1:length(x)) z[i] <<- x[i] + y[i]
+# 下面 cf 就是编译过的函数
+cf <- cmpfun(f)
+```
+
+out of memory 内存不够用的解决办法
+
+* 分块 chunking, 比例在read.table() 中用skip来实现
+* 用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine's main memory, which is ideal for multicore machines)
 
 # 关于 Object-Oriented
 http://adv-r.had.co.nz/OO-essentials.html
