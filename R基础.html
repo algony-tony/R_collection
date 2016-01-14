@@ -615,21 +615,21 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <p><strong>copy-on-change</strong> 一开始 y 和 z 共享一个内存地址, 如果有一个值发生变化, 则复制到新地址重新赋值.</p>
 <pre class="r"><code>z &lt;- runif(10)
 z</code></pre>
-<pre><code>##  [1] 0.4227234 0.4865831 0.3889441 0.9692589 0.7324311 0.4549353 0.3114127
-##  [8] 0.1473206 0.5016227 0.2348282</code></pre>
+<pre><code>##  [1] 0.82675812 0.57966751 0.50050024 0.30871893 0.50632555 0.62807323
+##  [7] 0.72711464 0.47027700 0.04791201 0.74447518</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x312a610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
 <pre class="r"><code>y &lt;- z
 tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x312a610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x312a610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
 <pre class="r"><code>y[3] &lt;- 8</code></pre>
-<pre><code>## tracemem[0x312a610 -&gt; 0x340e7f8]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
+<pre><code>## tracemem[0x4051610 -&gt; 0x43357f8]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x312a610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x340e7f8&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x43357f8&gt;&quot;</code></pre>
 <pre class="r"><code>untracemem(z)
 untracemem(y)</code></pre>
 <p>R 内部的内存复制是通过调用 duplicate() 函数来实现的(新版的R叫duplicate1()).</p>
@@ -639,7 +639,7 @@ untracemem(y)</code></pre>
 f &lt;- function() for (i in 1:length(x)) z[i] &lt;&lt;- x[i] + y[i]
 # 下面 cf 就是编译过的函数
 cf &lt;- cmpfun(f)</code></pre>
-<p>out of memory 内存不够用的解决办法</p>
+<p>out of memory 内存不够用的解决办法:</p>
 <ul>
 <li>分块 chunking, 比例在read.table() 中用skip来实现</li>
 <li>用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine’s main memory, which is ideal for multicore machines)</li>
@@ -868,7 +868,7 @@ methods(print)</code></pre>
 ##         writeLines(paste(format(x, ...), collapse = &quot;\n\n&quot;))
 ##     invisible(x)
 ## }
-## &lt;bytecode: 0x1dd0310&gt;
+## &lt;bytecode: 0x2cf7310&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 <p><em>RC(Reference Classes)</em> 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect(“blue”). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place</p>
 <p><em>base types</em> 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.</p>

@@ -1,0 +1,15 @@
+---
+title: "Gephi画网络图的简易教程"
+author: "zhutx"
+date: "2016/1/14"
+output: html_document
+---
+
+# 介绍
+Gephi 是网络上流传很广的一款数据可视化方面的开源软件, 主要以制作网络图谱, 复杂系统图谱和层级关系图出名, 就是类似于制作下面这样的图(图片取自该软件的官网). 本文使用的是0.9.0版本的 Gephi.
+
+![intro_layout1](./pic/layout1.png)
+![intro_layout2](./pic/layout2.png)
+
+# 制作步骤
+1. 

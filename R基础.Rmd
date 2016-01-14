@@ -521,7 +521,7 @@ f <- function() for (i in 1:length(x)) z[i] <<- x[i] + y[i]
 cf <- cmpfun(f)
 ```
 
-out of memory 内存不够用的解决办法
+out of memory 内存不够用的解决办法:
 
 * 分块 chunking, 比例在read.table() 中用skip来实现
 * 用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine's main memory, which is ideal for multicore machines)
