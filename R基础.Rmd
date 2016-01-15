@@ -1,6 +1,9 @@
 ---
 title: "R基础"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
 ---
 
 # 基础

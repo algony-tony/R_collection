@@ -2,7 +2,10 @@
 title: "Gephi画网络图的简易教程"
 author: "zhutx"
 date: "2016/1/14"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
 ---
 
 # 介绍

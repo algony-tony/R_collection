@@ -63,6 +63,34 @@ img {
 <h1 class="title">R基础</h1>
 </div>
 
+<div id="TOC">
+<ul>
+<li><a>基础</a><ul>
+<li><a href="#r-">R 的启动</a></li>
+<li><a href="#r-">R 帮助文档</a></li>
+<li><a href="#na-vs-null">NA vs NULL</a></li>
+</ul></li>
+<li><a href="#data-type">Data Type</a><ul>
+<li><a href="#vector">Vector</a></li>
+</ul></li>
+<li><a href="#matrix-array">Matrix &amp; Array</a></li>
+<li><a href="#list">List</a></li>
+<li><a href="#data-frame">Data Frame</a></li>
+<li><a href="#factor">Factor</a></li>
+<li><a href="#r-">R 程序结构</a></li>
+<li><a>函数的使用</a><ul>
+<li><a href="#paste">函数：paste</a></li>
+<li><a href="#diff">函数：diff</a></li>
+<li><a href="#sub">函数：sub</a></li>
+<li><a href="#-seq">函数: seq</a></li>
+<li><a href="#-repeat">函数: repeat</a></li>
+<li><a>字符串处理函数</a></li>
+<li><a href="#io-">I/O 函数</a></li>
+</ul></li>
+<li><a href="#r-">R 的性能</a></li>
+<li><a href="#-object-oriented">关于 Object-Oriented</a></li>
+</ul>
+</div>
 
 <div class="section level1">
 <h1>基础</h1>
@@ -615,21 +643,21 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <p><strong>copy-on-change</strong> 一开始 y 和 z 共享一个内存地址, 如果有一个值发生变化, 则复制到新地址重新赋值.</p>
 <pre class="r"><code>z &lt;- runif(10)
 z</code></pre>
-<pre><code>##  [1] 0.82675812 0.57966751 0.50050024 0.30871893 0.50632555 0.62807323
-##  [7] 0.72711464 0.47027700 0.04791201 0.74447518</code></pre>
+<pre><code>##  [1] 0.02129715 0.93782963 0.57235560 0.94535697 0.40034440 0.25409162
+##  [7] 0.94599009 0.01260653 0.84917255 0.31248530</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
 <pre class="r"><code>y &lt;- z
 tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
 <pre class="r"><code>y[3] &lt;- 8</code></pre>
-<pre><code>## tracemem[0x4051610 -&gt; 0x43357f8]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
+<pre><code>## tracemem[0x3bb5280 -&gt; 0x36646e0]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x4051610&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x43357f8&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x36646e0&gt;&quot;</code></pre>
 <pre class="r"><code>untracemem(z)
 untracemem(y)</code></pre>
 <p>R 内部的内存复制是通过调用 duplicate() 函数来实现的(新版的R叫duplicate1()).</p>
@@ -868,7 +896,7 @@ methods(print)</code></pre>
 ##         writeLines(paste(format(x, ...), collapse = &quot;\n\n&quot;))
 ##     invisible(x)
 ## }
-## &lt;bytecode: 0x2cf7310&gt;
+## &lt;bytecode: 0x2885978&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 <p><em>RC(Reference Classes)</em> 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect(“blue”). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place</p>
 <p><em>base types</em> 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.</p>
