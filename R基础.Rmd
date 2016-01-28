@@ -146,7 +146,7 @@ c(1,2,c(3,4))
 c(1,2,3,4)
 ```
 
-# Matrix & Array
+## Matrix & Array
 matrices 是附带两个属性的 vector, array 是多维 vector;
 ```{r}
 # 生成矩阵
@@ -226,7 +226,7 @@ colnames(y)
 rownames(y)
 ```
 
-# List
+## List
 list 其实也是 vector, 是 recursive vector, 嵌套的vector.
 ```{r}
 j <- list(name="Joe", salary=55000, union=T)
@@ -269,7 +269,7 @@ c(list(a=1,b=2,c=list(d=5,e=9)))
 c(list(a=1,b=2,c=list(d=5,e=9)),recursive=T)
 ```
 
-# Data Frame
+## Data Frame
 data frame 是一个 list, 该 list 每个分支都是长度相同的向量.
 事实上, R 允许 data frame 的分支是其他类型, 甚至是 data frame, 这种情形极少使用.
 

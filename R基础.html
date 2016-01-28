@@ -72,10 +72,10 @@ img {
 </ul></li>
 <li><a href="#data-type">Data Type</a><ul>
 <li><a href="#vector">Vector</a></li>
-</ul></li>
 <li><a href="#matrix-array">Matrix &amp; Array</a></li>
 <li><a href="#list">List</a></li>
 <li><a href="#data-frame">Data Frame</a></li>
+</ul></li>
 <li><a href="#factor">Factor</a></li>
 <li><a href="#r-">R 程序结构</a></li>
 <li><a>函数的使用</a><ul>
@@ -188,9 +188,8 @@ names(x) &lt;- NULL</code></pre>
 <pre class="r"><code>c(1,2,3,4)</code></pre>
 <pre><code>## [1] 1 2 3 4</code></pre>
 </div>
-</div>
-<div id="matrix-array" class="section level1">
-<h1>Matrix &amp; Array</h1>
+<div id="matrix-array" class="section level2">
+<h2>Matrix &amp; Array</h2>
 <p>matrices 是附带两个属性的 vector, array 是多维 vector;</p>
 <pre class="r"><code># 生成矩阵
 y &lt;- matrix(c(1:4), nrow=2, ncol=2, byrow=TRUE)
@@ -311,8 +310,8 @@ colnames(y)</code></pre>
 <pre class="r"><code>rownames(y)</code></pre>
 <pre><code>## [1] &quot;r1&quot; &quot;r2&quot;</code></pre>
 </div>
-<div id="list" class="section level1">
-<h1>List</h1>
+<div id="list" class="section level2">
+<h2>List</h2>
 <p>list 其实也是 vector, 是 recursive vector, 嵌套的vector.</p>
 <pre class="r"><code>j &lt;- list(name=&quot;Joe&quot;, salary=55000, union=T)
 j</code></pre>
@@ -405,8 +404,8 @@ c(list(a=1,b=2,c=list(d=5,e=9)),recursive=T)</code></pre>
 <pre><code>##   a   b c.d c.e 
 ##   1   2   5   9</code></pre>
 </div>
-<div id="data-frame" class="section level1">
-<h1>Data Frame</h1>
+<div id="data-frame" class="section level2">
+<h2>Data Frame</h2>
 <p>data frame 是一个 list, 该 list 每个分支都是长度相同的向量. 事实上, R 允许 data frame 的分支是其他类型, 甚至是 data frame, 这种情形极少使用.</p>
 <pre class="r"><code>df &lt;- as.data.frame(list(sname=c(&quot;n1&quot;,&quot;n2&quot;,&quot;n3&quot;), kv=c(6,8,10)))
 df</code></pre>
@@ -426,6 +425,7 @@ df</code></pre>
 ## 3    n3 10</code></pre>
 <p>complete.case() 函数判断哪些行是完整的, 即不包含 NA 的行.</p>
 <p>在 data frame 中加入新列, 新加入向量长度过长会报错, 过短就 cycling.</p>
+</div>
 </div>
 <div id="factor" class="section level1">
 <h1>Factor</h1>
@@ -643,21 +643,21 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <p><strong>copy-on-change</strong> 一开始 y 和 z 共享一个内存地址, 如果有一个值发生变化, 则复制到新地址重新赋值.</p>
 <pre class="r"><code>z &lt;- runif(10)
 z</code></pre>
-<pre><code>##  [1] 0.02129715 0.93782963 0.57235560 0.94535697 0.40034440 0.25409162
-##  [7] 0.94599009 0.01260653 0.84917255 0.31248530</code></pre>
+<pre><code>##  [1] 0.7113759 0.6118781 0.5756170 0.3149388 0.4161829 0.3740416 0.4734482
+##  [8] 0.6592579 0.8182308 0.2324209</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
 <pre class="r"><code>y &lt;- z
 tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
 <pre class="r"><code>y[3] &lt;- 8</code></pre>
-<pre><code>## tracemem[0x3bb5280 -&gt; 0x36646e0]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
+<pre><code>## tracemem[0x23aaa90 -&gt; 0x2672b10]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x3bb5280&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x36646e0&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2672b10&gt;&quot;</code></pre>
 <pre class="r"><code>untracemem(z)
 untracemem(y)</code></pre>
 <p>R 内部的内存复制是通过调用 duplicate() 函数来实现的(新版的R叫duplicate1()).</p>
@@ -896,7 +896,7 @@ methods(print)</code></pre>
 ##         writeLines(paste(format(x, ...), collapse = &quot;\n\n&quot;))
 ##     invisible(x)
 ## }
-## &lt;bytecode: 0x2885978&gt;
+## &lt;bytecode: 0x107c978&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 <p><em>RC(Reference Classes)</em> 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect(“blue”). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place</p>
 <p><em>base types</em> 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.</p>
