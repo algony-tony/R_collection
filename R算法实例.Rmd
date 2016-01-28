@@ -1,0 +1,15 @@
+---
+title: "R算法实例"
+author: "zhutx"
+date: "2016/1/29"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+# 聚类(Clustering)
+
+# 分类(Classification)
+
+
