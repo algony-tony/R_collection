@@ -8,6 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
+<meta name="author" content="zhutx" />
 
 
 <title>R基础</title>
@@ -61,6 +62,7 @@ img {
 
 <div id="header">
 <h1 class="title">R基础</h1>
+<h4 class="author"><em>zhutx</em></h4>
 </div>
 
 <div id="TOC">
@@ -631,7 +633,9 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 </div>
 <div id="r-" class="section level1">
 <h1>R 的性能</h1>
-<p>R is an interpreted language, 会话中的对象都存储在内存中,</p>
+<p>R is an interpreted language, 会话中的对象都存储在内存中.</p>
+<p>在 Windows 下, 可以通过 memory.size(NA) 或者 memory.limit() 函数来查看分配给 R 的内存大小, 通过 memory.size(F) 查看当前 R 已使用的内存, memory.size(T) 查看已分配的内存, 刚开始时已使用内存和已分配内存是同步增加的, 但是随着 R 中的垃圾被清理, 已使用内存会减少, 而已分配给R的内存一般不会改变. 可以通过 memory.limit(size= 2000) 来指定可分配的最大内存数, 单位 MB.</p>
+<p>在类 Unix 系统中, R 的内存显示是通过 shell 里的对单个进程的限制来控制的, 一般是 shell 里的 limit 或者 ulimit 命令来控制的.</p>
 <p>write R code faster:</p>
 <ul>
 <li>通过向量化 vectorization, 用字节码use of byte-code compilation, and other approaches</li>
@@ -643,21 +647,21 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <p><strong>copy-on-change</strong> 一开始 y 和 z 共享一个内存地址, 如果有一个值发生变化, 则复制到新地址重新赋值.</p>
 <pre class="r"><code>z &lt;- runif(10)
 z</code></pre>
-<pre><code>##  [1] 0.7113759 0.6118781 0.5756170 0.3149388 0.4161829 0.3740416 0.4734482
-##  [8] 0.6592579 0.8182308 0.2324209</code></pre>
+<pre><code>##  [1] 0.3248256 0.6366177 0.5828987 0.9647697 0.2927686 0.1015861 0.6953688
+##  [8] 0.9661878 0.8120405 0.3527556</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
 <pre class="r"><code>y &lt;- z
 tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
 <pre class="r"><code>y[3] &lt;- 8</code></pre>
-<pre><code>## tracemem[0x23aaa90 -&gt; 0x2672b10]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
+<pre><code>## tracemem[0x2d65680 -&gt; 0x2fa88b8]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x23aaa90&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x2672b10&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2fa88b8&gt;&quot;</code></pre>
 <pre class="r"><code>untracemem(z)
 untracemem(y)</code></pre>
 <p>R 内部的内存复制是通过调用 duplicate() 函数来实现的(新版的R叫duplicate1()).</p>
@@ -667,11 +671,16 @@ untracemem(y)</code></pre>
 f &lt;- function() for (i in 1:length(x)) z[i] &lt;&lt;- x[i] + y[i]
 # 下面 cf 就是编译过的函数
 cf &lt;- cmpfun(f)</code></pre>
-<p>out of memory 内存不够用的解决办法:</p>
+<p>out of memory 内存不够用的解决办法(除了提高服务器内存这个省时省力的办法):</p>
 <ul>
-<li>分块 chunking, 比例在read.table() 中用skip来实现</li>
-<li>用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine’s main memory, which is ideal for multicore machines)</li>
+<li>在程序中经常使用 rm() 来删除不用的对象是个释放内存的好习惯;</li>
+<li>分块 chunking, 比如在 read.table() 中用skip来实现;</li>
+<li>用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine’s main memory, which is ideal for multicore machines);</li>
 </ul>
+<p>rm() 用来删除对象, 只会先删除对象的引用, 并不会马上清理对象占据的内存, 失去引用的空间就成了内存中的垃圾, R 在一段时间内会自动发现垃圾并集中清理, 也可以通过运行垃圾回收函数 gc() 来手动触发, 但是一般情况下没这个必要.</p>
+<p>R中的对象（比如矩阵）在内存中存于两种不同的地方, 一种是堆内存（heap）, 其基本单元是“Vcells”, 每个大小为8字节, 新来一个对象就会申请一块空间, 把值全部存在这里, 和C里面的堆内存很像. 第二种是地址对（cons cells）, 和LISP里的cons cells道理一样, 主要用来存储地址信息, 最小单元一般在32位系统中是28字节、64位系统中是56字节. 在R中, 可以通过ls()来查看当前所有对象名, 对于每一个对象, 可以通过object.size(x)来查看其占用内存的大小.</p>
+<p>如果是因为当前对象占用内存过多, 那么可以通过处理对象来获取更大的可用内存. 一个很有用的方法是改变对象的存储模式, 通过storage.mode（x）可以看到某个对象的存储模式, 比如某个矩阵默认就是“double”的, 如果这个矩阵的数值都是整数甚至0-1, 完全没必要使用double来占用空间, 可以使用storage.mode(x） &lt;- “integer”将其改为整数型, 可以看到该对象的大小会变为原来的一半.</p>
+<p>R中矩阵的维度并不需要赋一个固定的值（很多语言的数组长度不能为变量）, 这为写程序带来了极大的方便, 因此经常在循环中会出现某个矩阵越来越长的情况, 实际上, 矩阵每增长一次, 即使赋给同名的变量, 都需要新开辟一块更大的空间, 假设初始矩阵为100K, 第二个为101K, 一直增到120K, 那么, 将会分别开辟100K、101K一直到120K的连续堆内存, 如果一开始就开一块120K的, 使之从101K逐渐增长到120K, 将会大大地节约内存.</p>
 </div>
 <div id="-object-oriented" class="section level1">
 <h1>关于 Object-Oriented</h1>
@@ -896,7 +905,7 @@ methods(print)</code></pre>
 ##         writeLines(paste(format(x, ...), collapse = &quot;\n\n&quot;))
 ##     invisible(x)
 ## }
-## &lt;bytecode: 0x107c978&gt;
+## &lt;bytecode: 0x1d27128&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 <p><em>RC(Reference Classes)</em> 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect(“blue”). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place</p>
 <p><em>base types</em> 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.</p>

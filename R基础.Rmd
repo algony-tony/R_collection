@@ -482,7 +482,11 @@ read.table() 和 scan() 函数可以接收网址为参数.
 * socketSelect() : This is useful when a server is connected to multiple clients. Its main argument, socklist , is a list of connections, and its return value is the sublist of connections that have data ready for the server to read.
 
 # R 的性能
-R is an interpreted language, 会话中的对象都存储在内存中, 
+R is an interpreted language, 会话中的对象都存储在内存中. 
+
+在 Windows 下, 可以通过 memory.size(NA) 或者 memory.limit() 函数来查看分配给 R 的内存大小, 通过 memory.size(F) 查看当前 R 已使用的内存, memory.size(T) 查看已分配的内存, 刚开始时已使用内存和已分配内存是同步增加的, 但是随着 R 中的垃圾被清理, 已使用内存会减少, 而已分配给R的内存一般不会改变. 可以通过 memory.limit(size= 2000) 来指定可分配的最大内存数, 单位 MB. 
+
+在类 Unix 系统中, R 的内存显示是通过 shell 里的对单个进程的限制来控制的, 一般是 shell 里的 limit 或者 ulimit 命令来控制的.
 
 write R code faster: 
 
@@ -525,10 +529,19 @@ f <- function() for (i in 1:length(x)) z[i] <<- x[i] + y[i]
 cf <- cmpfun(f)
 ```
 
-out of memory 内存不够用的解决办法:
+out of memory 内存不够用的解决办法(除了提高服务器内存这个省时省力的办法):
 
-* 分块 chunking, 比例在read.table() 中用skip来实现
-* 用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine's main memory, which is ideal for multicore machines)
+* 在程序中经常使用 rm() 来删除不用的对象是个释放内存的好习惯;
+* 分块 chunking, 比如在 read.table() 中用skip来实现;
+* 用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine's main memory, which is ideal for multicore machines);
+
+rm() 用来删除对象, 只会先删除对象的引用, 并不会马上清理对象占据的内存, 失去引用的空间就成了内存中的垃圾, R 在一段时间内会自动发现垃圾并集中清理, 也可以通过运行垃圾回收函数 gc() 来手动触发, 但是一般情况下没这个必要. 
+
+R中的对象（比如矩阵）在内存中存于两种不同的地方, 一种是堆内存（heap）, 其基本单元是“Vcells”, 每个大小为8字节, 新来一个对象就会申请一块空间, 把值全部存在这里, 和C里面的堆内存很像. 第二种是地址对（cons cells）, 和LISP里的cons cells道理一样, 主要用来存储地址信息, 最小单元一般在32位系统中是28字节、64位系统中是56字节. 在R中, 可以通过ls()来查看当前所有对象名, 对于每一个对象, 可以通过object.size(x)来查看其占用内存的大小. 
+
+如果是因为当前对象占用内存过多, 那么可以通过处理对象来获取更大的可用内存. 一个很有用的方法是改变对象的存储模式, 通过storage.mode（x）可以看到某个对象的存储模式, 比如某个矩阵默认就是“double”的, 如果这个矩阵的数值都是整数甚至0-1, 完全没必要使用double来占用空间, 可以使用storage.mode(x） <- "integer"将其改为整数型, 可以看到该对象的大小会变为原来的一半. 
+
+R中矩阵的维度并不需要赋一个固定的值（很多语言的数组长度不能为变量）, 这为写程序带来了极大的方便, 因此经常在循环中会出现某个矩阵越来越长的情况, 实际上, 矩阵每增长一次, 即使赋给同名的变量, 都需要新开辟一块更大的空间, 假设初始矩阵为100K, 第二个为101K, 一直增到120K, 那么, 将会分别开辟100K、101K一直到120K的连续堆内存, 如果一开始就开一块120K的, 使之从101K逐渐增长到120K, 将会大大地节约内存. 
 
 # 关于 Object-Oriented
 http://adv-r.had.co.nz/OO-essentials.html
