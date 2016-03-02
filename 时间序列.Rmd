@@ -1,0 +1,69 @@
+---
+title: "时间序列"
+author: "zhutx"
+date: "2016/3/1"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+## 读取数据
+读取英格兰连续42位君主的离世年纪所构成的时间序列
+```
+kings <- scan("http://robjhyndman.com/tsdldata/misc/kings.dat", skip=3)
+kings
+kingstimeseries <- ts(kings)
+kingstimeseries
+```
+
+读取纽约从1946到1956年每月的出生人口的时间序列
+```
+births <- scan("http://robjhyndman.com/tsdldata/data/nybirths.dat")
+birthstimeseries <- ts(births, frequency=12, start=c(1946,1))
+birthstimeseries
+```
+
+读取澳大利亚昆士兰一个海滩度假村的纪念品商店从1987到1993每月的销售额数据
+```
+souvenir <- scan("http://robjhyndman.com/tsdldata/data/fancy.dat")
+souvenirtimeseries <- ts(souvenir, frequency=12, start=c(1987,1))
+souvenirtimeseries
+```
+
+## 画图, 数据探索
+```
+plot.ts(kingstimeseries)
+plot.ts(birthstimeseries)
+plot.ts(souvenirtimeseries)
+# 从上面看第三个时序模型不适合用加性模型, 因为季节波动的部分随着时间也在放大
+# 所以可以对上面纪念品商品的月销售额数据先做一些变换
+logsouvenirtimeseries <- log(souvenirtimeseries)
+plot.ts(logsouvenirtimeseries)
+```
+
+## 分解时间序列
+
+### 分解非周期性数据
+对于非周期性数据, 分解的工作就是将其分解成趋势部分和不规则变动部分. 对于可应用加性模型的非周期性时序数据, 要分解它的趋势部分, 通常可以使用平滑法, 比如使用常见的的移动平均值曲线来表示趋势部分. 移动平均可以使用 "TTR" 包中的 SMA() 函数来计算.
+```{r sma}
+library("TTR")
+kingstimeseriesSMA3 <- SMA(kingstimeseries, n=3)
+plot.ts(kingstimeseriesSMA3)
+kingstimeseriesSMA8 <- SMA(kingstimeseries, n=8)
+plot.ts(kingstimeseriesSMA8)
+```
+
+### 分解季节性数据
+季节性时序数据包含有三部分, 趋势部分, 周期性变化部分和不规则变化部分. 对于分解季节性数据可以使用 decompose() 函数, 该函数会返回一个对象列表, 会讲上面提到的三个部分分别存入 "seasonal", "trend" 和 "random" 三个对象中.
+```{r decompose}
+birthstimeseriescomponents <- decompose(birthstimeseries)
+birthstimeseriescomponents$seasonal
+plot(birthstimeseriescomponents)
+```
+
+
+
+
+参考:
+1. [A Little Book of R For Time Series](http://a-little-book-of-r-for-time-series.readthedocs.org/en/latest/)
