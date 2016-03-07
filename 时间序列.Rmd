@@ -10,7 +10,7 @@ output:
 
 ## 读取数据
 读取英格兰连续42位君主的离世年纪所构成的时间序列
-```
+```{r}
 kings <- scan("http://robjhyndman.com/tsdldata/misc/kings.dat", skip=3)
 kings
 kingstimeseries <- ts(kings)
@@ -18,21 +18,21 @@ kingstimeseries
 ```
 
 读取纽约从1946到1956年每月的出生人口的时间序列
-```
+```{r}
 births <- scan("http://robjhyndman.com/tsdldata/data/nybirths.dat")
 birthstimeseries <- ts(births, frequency=12, start=c(1946,1))
 birthstimeseries
 ```
 
 读取澳大利亚昆士兰一个海滩度假村的纪念品商店从1987到1993每月的销售额数据
-```
+```{r}
 souvenir <- scan("http://robjhyndman.com/tsdldata/data/fancy.dat")
 souvenirtimeseries <- ts(souvenir, frequency=12, start=c(1987,1))
 souvenirtimeseries
 ```
 
 ## 画图, 数据探索
-```
+```{r}
 plot.ts(kingstimeseries)
 plot.ts(birthstimeseries)
 plot.ts(souvenirtimeseries)
@@ -62,6 +62,19 @@ birthstimeseriescomponents$seasonal
 plot(birthstimeseriescomponents)
 ```
 
+## 用指数平滑来做预测
+
+指数平滑可以用来对短期的时序数据做短期的预测.
+
+### 简单指数平滑
+
+如果有一个时间序列数据, 它可以用加性模型来描述, 保持固定的水平趋势并不带季节性, 那么你可以用简单的指数平滑法来做短期的预测. 
+
+```{r}
+rain <- scan("http://robjhyndman.com/tsdldata/hurst/precip1.dat", skip=1)
+rainseries <- ts(rain, start=c(1813))
+plot.ts(rainseries)
+```
 
 
 
