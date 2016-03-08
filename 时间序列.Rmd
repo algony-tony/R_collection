@@ -70,12 +70,96 @@ plot(birthstimeseriescomponents)
 
 如果有一个时间序列数据, 它可以用加性模型来描述, 保持固定的水平趋势并不带季节性, 那么你可以用简单的指数平滑法来做短期的预测. 
 
+简单指数平滑法提供一种预测当前值的办法, 它的平滑度是由参数 alpha 来控制的, 参数 alpha 值介于 0,1 之间, alpha 越靠近 0 表示预测值越依赖最近的观测点.
+
+下面是伦敦从 1813-1912 年每年总降雨量的英寸数.
 ```{r}
 rain <- scan("http://robjhyndman.com/tsdldata/hurst/precip1.dat", skip=1)
 rainseries <- ts(rain, start=c(1813))
 plot.ts(rainseries)
 ```
 
+从上图中可以看出, 每年的降雨量大致保持在 25 英寸左右, 时间序列的随机部分大致保持在一个量级上, 所以是适用于加性模型的, 这样我们就可以用简单的指数平滑法来做预测.
+
+在 R 中应用简单指数平滑法来做预测可以使用 HoltWinters() 函数. 用 HoltWinters() 做简单的指数平滑预测时需要设置参数 beta=FALSE 和 gamma=FALSE.
+
+```{r}
+rainseriesforecasts <- HoltWinters(rainseries, beta = FALSE, gamma = FALSE)
+rainseriesforecasts
+```
+
+上面函数的输出告诉我们估计的 alpha 值为 0.024, 这是非常接近零的, 从而告诉我们这个预测值更多地依赖于最近的观测值. HoltWinters() 函数默认只对输入的时间段做出预测值, 并将其存储在 fitted 变量中.
+
+```{r}
+rainseriesforecasts$fitted
+plot(rainseriesforecasts)
+```
+
+上图中黑色曲线的是原始的时间序列数据, 红色的是预测值, 可以看出预测值比原始数据要平滑很多. 
+
+在做简单指数平滑法时经常使用时间序列的第一个值作为整个时序数据的水平值, 比如在上面的例子中, 就是使用 1813 年的降雨量 23.56 作为水平值, 在 HoltWinters() 函数中就是使用 l.start 参数来设置这个值, 如下.
+
+```{r}
+HoltWinters(rainseries, beta = FALSE, gamma = FALSE, l.start=23.56)
+```
+
+要使用 HoltWinters() 模型做对未来的预测需要使用 forecast 包的 forecast.HoltWinters() 函数, 通过参数 h 来指定要预测的点的个数. 预测函数会给出预测值以及相应的 80% 和 95% 置信区间的范围. 
+
+```{r}
+library(forecast)
+rainseriesforecasts2 <- forecast.HoltWinters(rainseriesforecasts, h=8)
+rainseriesforecasts2
+plot.forecast(rainseriesforecasts2)
+```
+
+作为预测准确率的一个度量值, 可以调用 SSE (Sum of Squared errors)变量来查看, forecast.HoltWinters 函数的残数存在变量 residuals 中.
+
+```{r}
+rainseriesforecasts$SSE
+rainseriesforecasts2$residuals
+```
+
+如果预测偏差的残数的前后相继值还有相关性, 就说明这个预测模型还有改进的余地, 为了验证是否存在这种情况, 我们选取 1-20 个时间间隔来计算相关性, 这个可以通过 acf() 函数来计算.
+
+```{r}
+acf(rainseriesforecasts2$residuals, lag.max = 20)
+```
+
+从上图中可以看到, 在间隔为 3 时自相关系数触到了显著性的警戒线. 为了进一步验证在时间间隔在 1-20 时是否存在非零的自相关系数的显著性证据, 我们可以使用 Ljung-Box 检验, 使用 Box.test() 函数来做这件事.
+
+```{r}
+Box.test(rainseriesforecasts2$residuals, lag=20, type="Ljung-Box")
+```
+
+此处 Ljung-Box 检验的统计量是 17.4, p 值是 0.6, 所以很难支撑说有非零的自相关性. 为了更好地说明这个预测已经没法更好地改进的时候, 去检验预测的残差是否满足期望为 0 方差稳定的正态分布也是个好办法, 下面通过定义函数 plotForecastErrors 来画出这样的图.
+
+```{r}
+plot.ts(rainseriesforecasts2$residuals)
+
+plotForecastErrors <- function(forecasterrors)
+{
+  # 计算画预测误差的直方图所需的值
+  mybinsize <- IQR(forecasterrors)/4
+  mysd <- sd(forecasterrors)
+  mymin <- min(forecasterrors) - mysd*5
+  mymax <- max(forecasterrors) + mysd*3
+  # 生成正态分布图, 期望为 0 , 方差和误差值的方差相同
+  mynorm <- rnorm(1000, mean=0, sd=mysd)
+  mymin2 <- min(mynorm)
+  mymax2 <- max(mynorm)
+  if (mymin2 < mymin) { mymin <- mymin2 }
+  if (mymax2 > mymax) { mymax <- mymax2 }
+  # 
+  mybins <- seq(mymin, mymax, mybinsize)
+  hist(forecasterrors, col="red", freq=FALSE, breaks=mybins)
+  myhist <- hist(mynorm, plot=FALSE, breaks=mybins)
+  points(myhist$mids, myhist$density, type="l", col="blue", lwd=2)
+}
+
+plotForecastErrors(rainseriesforecasts2$residuals)
+```
+
+上图显示预测的误差值大致符合正态分布, 小幅右偏. 所以从上面的 Ljung-Box 检验和误差值的正态分布值的图形都可以看出, 简单指数平滑法在预测伦敦的年降雨量是适用的, 并且没有更好的改进方法.
 
 
 参考:
