@@ -5,10 +5,13 @@ date: "2016/3/1"
 output:
   html_document:
     toc: true
-    toc_depth: 2
+    toc_depth: 3
 ---
 
+# 时间序列入门
+
 ## 读取数据
+
 读取英格兰连续42位君主的离世年纪所构成的时间序列
 ```{r}
 kings <- scan("http://robjhyndman.com/tsdldata/misc/kings.dat", skip=3)
@@ -42,7 +45,7 @@ logsouvenirtimeseries <- log(souvenirtimeseries)
 plot.ts(logsouvenirtimeseries)
 ```
 
-## 分解时间序列
+## 分解时间序列 
 
 ### 分解非周期性数据
 对于非周期性数据, 分解的工作就是将其分解成趋势部分和不规则变动部分. 对于可应用加性模型的非周期性时序数据, 要分解它的趋势部分, 通常可以使用平滑法, 比如使用常见的的移动平均值曲线来表示趋势部分. 移动平均可以使用 "TTR" 包中的 SMA() 函数来计算.
@@ -161,7 +164,50 @@ plotForecastErrors(rainseriesforecasts2$residuals)
 
 上图显示预测的误差值大致符合正态分布, 小幅右偏. 所以从上面的 Ljung-Box 检验和误差值的正态分布值的图形都可以看出, 简单指数平滑法在预测伦敦的年降雨量是适用的, 并且没有更好的改进方法.
 
-## Holt 指数平滑
+### Holt 指数平滑
+
+如果时间序列能用加性模型, 有上升或者下降趋势, 但是没有周期性波动, 可以应用 Holt 指数平滑法做短期的预测. 这个模型的预测由参数 alpha 和 beta 控制, beta 参数是和趋势的斜率有关, 两个参数的取值都在 0,1 之间.
+
+下面是适用带趋势的加性模型且没有周期性的时间序列数据, 取得是从 1866-1911 每年的女性裙子的直径长度的数据.
+
+```{r}
+skirts <- scan("http://robjhyndman.com/tsdldata/roberts/skirts.dat", skip=5)
+skirtsseries <- ts(skirts, start=c(1866))
+plot.ts(skirtsseries)
+skirtsseriesforecasts <- HoltWinters(skirtsseries, gamma=FALSE)
+skirtsseriesforecasts
+```
+
+从上面可以看出 alpha 的值为 0.84, beta 的值为 1, 这两个值都离 1 很近, 说明预测值对最新的值的依赖度很高. 下面将画出实际值和预测值, 预测值用红色线表示.
+
+```{r}
+plot(skirtsseriesforecasts)
+```
+
+一般地还可以指定初始值, 在上面这个例子中, 初始点就是 1866 年的裙长 608, 斜率的初始值为第二个时间点的值减掉第一个点的值, 在此处是 9.
+
+```{r}
+HoltWinters(skirtsseries, gamma = FALSE, l.start = 608, b.start = 9)
+```
+
+用 Holt 模型来做预测, 同样的, 会有 80% 和 95% 置信区间.
+
+```{r}
+skirtsseriesforecasts2 <- forecast.HoltWinters(skirtsseriesforecasts, h=19)
+plot.forecast(skirtsseriesforecasts2)
+```
+
+同样地, 做 Ljung-Box 检验, 检验误差的自相关性.
+```{r}
+acf(skirtsseriesforecasts2$residuals, lag.max = 20)
+Box.test(skirtsseriesforecasts2$residuals, lag = 20, type = "Ljung-Box")
+```
+
+从上面可以看出, 在延迟为 5 时自相关性超过了警戒值, 但是从 Ljung-Box 检验中没有自相关性为非 0 的显著性的支持. 对残差做正态性分布分析.
+```{r}
+plot.ts(skirtsseriesforecasts2$residuals)
+plotForecastErrors(skirtsseriesforecasts2$residuals)
+```
 
 
 
