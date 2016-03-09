@@ -556,6 +556,11 @@ seq(1, 4)</code></pre>
 <pre><code>## [1] 1 2 3 4</code></pre>
 <pre class="r"><code>1:4</code></pre>
 <pre><code>## [1] 1 2 3 4</code></pre>
+<pre class="r"><code># 还可以使用有理数
+seq(-7.22, 13.703, 1.237405)</code></pre>
+<pre><code>##  [1] -7.220000 -5.982595 -4.745190 -3.507785 -2.270380 -1.032975  0.204430
+##  [8]  1.441835  2.679240  3.916645  5.154050  6.391455  7.628860  8.866265
+## [15] 10.103670 11.341075 12.578480</code></pre>
 <p>当 x 不是空向量时, 下面两个等价, 否则前者会执行两次, 而后者不会执行, 所以后面一种形式更好</p>
 <pre class="r"><code>x &lt;- c(&quot;a&quot;, &quot;c&quot;)
 for(i in 1:length(x)){print(&quot;1&quot;)}</code></pre>
@@ -647,21 +652,21 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <p><strong>copy-on-change</strong> 一开始 y 和 z 共享一个内存地址, 如果有一个值发生变化, 则复制到新地址重新赋值.</p>
 <pre class="r"><code>z &lt;- runif(10)
 z</code></pre>
-<pre><code>##  [1] 0.3248256 0.6366177 0.5828987 0.9647697 0.2927686 0.1015861 0.6953688
-##  [8] 0.9661878 0.8120405 0.3527556</code></pre>
+<pre><code>##  [1] 0.41698760 0.25763042 0.74774755 0.89841312 0.50304779 0.62075148
+##  [7] 0.04392932 0.55421145 0.62937474 0.78386551</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2e13868&gt;&quot;</code></pre>
 <pre class="r"><code>y &lt;- z
 tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2e13868&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2e13868&gt;&quot;</code></pre>
 <pre class="r"><code>y[3] &lt;- 8</code></pre>
-<pre><code>## tracemem[0x2d65680 -&gt; 0x2fa88b8]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
+<pre><code>## tracemem[0x2e13868 -&gt; 0x2c00078]: eval eval withVisible withCallingHandlers handle evaluate_call &lt;Anonymous&gt; in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x2d65680&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2e13868&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x2fa88b8&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x2c00078&gt;&quot;</code></pre>
 <pre class="r"><code>untracemem(z)
 untracemem(y)</code></pre>
 <p>R 内部的内存复制是通过调用 duplicate() 函数来实现的(新版的R叫duplicate1()).</p>
@@ -905,7 +910,7 @@ methods(print)</code></pre>
 ##         writeLines(paste(format(x, ...), collapse = &quot;\n\n&quot;))
 ##     invisible(x)
 ## }
-## &lt;bytecode: 0x1d27128&gt;
+## &lt;bytecode: 0x2f87af0&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 <p><em>RC(Reference Classes)</em> 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect(“blue”). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place</p>
 <p><em>base types</em> 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.</p>
