@@ -209,6 +209,48 @@ plot.ts(skirtsseriesforecasts2$residuals)
 plotForecastErrors(skirtsseriesforecasts2$residuals)
 ```
 
+### Holt-Winters 指数平滑法
+
+用于可用加性模型, 有趋势并带有季节波动的时间序列数据, 可以使用 Holt-Winters 指数平滑法来做短期的时间预测. 改算法使用介于 0,1 之间的三个参数, alpha, beta, gamma 来控制当前点的水平值, 斜率和季节性部分.
+
+下面使用澳大利亚昆士兰一个度假海岸的纪念品商店的月销售数据来做解释.
+```{r}
+logsouvenirtimeseries <- log(souvenirtimeseries)
+souvenirtimeseriesforecasts <- HoltWinters(logsouvenirtimeseries)
+souvenirtimeseriesforecasts
+souvenirtimeseriesforecasts$SSE
+plot(souvenirtimeseriesforecasts)
+```
+
+上面的计算结果显示 alph, beta, gamma 分别为 0.41, 0, 0.96. 预测未来的值要使用 forecast 包中的 forecast.HoltWinters() 函数.
+
+```{r}
+library(forecast)
+souvenirtimeseriesforecasts2 <- forecast.HoltWinters(souvenirtimeseriesforecasts, h=48)
+plot.forecast(souvenirtimeseriesforecasts2)
+```
+
+同样的, 下面做检验
+
+```{r}
+acf(souvenirtimeseriesforecasts2$residuals, lag.max = 20)
+Box.test(souvenirtimeseriesforecasts2$residuals, lag=20, type="Ljung-Box")
+```
+
+下面做残差图
+
+```{r}
+plot.ts(souvenirtimeseriesforecasts2$residuals)
+plotForecastErrors(souvenirtimeseriesforecasts2$residuals)
+```
+
+## ARIMA 模型
+
+指数平滑法在做预测的时候很有用, 它不用假设相连数据的相关性, 但是, 当你需要用它做一段时间的预测的时候, 需要在预测区间的误差无自相关性并且误差满足期望为 0 方差为常值的正态分布.
+
+指数平滑法不需要假设数据有自相关性, 但是有时候我们可以更好地利用数据的自相关性来改进预测. Autoregressive Integrated Moving Average (ARIMA) 模型包含一个对时间序列无规则的部分的显式统计模型, 这个允许不规则部分有非零的自相关性.
+
+
 
 
 参考:
