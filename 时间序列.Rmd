@@ -250,7 +250,33 @@ plotForecastErrors(souvenirtimeseriesforecasts2$residuals)
 
 指数平滑法不需要假设数据有自相关性, 但是有时候我们可以更好地利用数据的自相关性来改进预测. Autoregressive Integrated Moving Average (ARIMA) 模型包含一个对时间序列无规则的部分的显式统计模型, 这个允许不规则部分有非零的自相关性.
 
+ARIMA(p,d,q) 里面有三个参数, 其中 d 是对时序做差分的次数, 
 
+对 1866-1911 年的女性裙长的数据应用 ARIMA 模型
+
+```{r}
+plot.ts(skirtsseries)
+skirtsseriesdiff1 <- diff(skirtsseries, differences = 1)
+plot.ts(skirtsseriesdiff1)
+skirtsseriesdiff2 <- diff(skirtsseries, differences = 2)
+plot.ts(skirtsseriesdiff2)
+```
+
+做二阶的差分后时序数据已经保持稳定, 对于稳定性的检测可以使用"单位根检验"(unit root tests), 相应的 R 包 fUnitRoots. 下面国王的时序数据做一阶差分就稳定.
+
+```{r}
+kingstimeseriesdiff1 <- diff(kingstimeseries, differences = 1)
+plot.ts(kingstimeseriesdiff1)
+```
+
+计算自相关和偏自相关的系数, 可以使用 R 中的 acf() 和 pacf() 函数来计算, 通过设置参数 plot=FALSE 来得到具体的数值.
+
+```{r}
+acf(kingstimeseriesdiff1, lag.max = 20)
+acf(kingstimeseriesdiff1, lag.max = 20, plot = FALSE)
+pacf(kingstimeseriesdiff1, lag.max = 20)
+pacf(kingstimeseriesdiff1, lag.max = 20, plot = FALSE)
+```
 
 
 参考:
