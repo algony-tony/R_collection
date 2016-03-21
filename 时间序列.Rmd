@@ -269,7 +269,7 @@ kingstimeseriesdiff1 <- diff(kingstimeseries, differences = 1)
 plot.ts(kingstimeseriesdiff1)
 ```
 
-计算自相关和偏自相关的系数, 可以使用 R 中的 acf() 和 pacf() 函数来计算, 通过设置参数 plot=FALSE 来得到具体的数值.
+计算自相关 (autocorrelogram) 和偏自相关的系数, 可以使用 R 中的 acf() 和 pacf() 函数来计算, 通过设置参数 plot=FALSE 来得到具体的数值.
 
 ```{r}
 acf(kingstimeseriesdiff1, lag.max = 20)

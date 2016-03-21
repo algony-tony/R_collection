@@ -1,0 +1,20 @@
+---
+title: "包的使用-reshape2"
+author: "zhutx"
+date: "2016/3/22"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+# 简介
+
+reshape 和 reshape2 包是 Hadley Wickham 写的包, 主要在数据的宽格式(wide format)和长格式(long format)之间做转化使用.
+
+
+参考:
+1. [An Introduction to reshape2](http://seananderson.ca/2013/10/19/reshape.html)
+
+
+
