@@ -8,11 +8,11 @@ output:
 ---
 
 # 基础
-在交互环境下执行一个 R 文件  
+在交互环境下执行一个 R 文件
 ```
-source("z.R")  
+source("z.R")
 ```
-在批处理环境下执行  
+在批处理环境下执行
 ```
 R CMD BATCH z.R
 ```
@@ -70,11 +70,11 @@ x[which(x>5)]
 subset(x,x>5)
 ```
 
-# Data Type 
-**vector** 每个元素的mode（数据类型）要一致, 单个数字、字符串都是长度为 1 的向量.  
-**matrix** 是附带了两个属性的向量，行数和列数.  
-**list** 是不要求类型一致的 vector.  
-**data frame** 是list，这种list每个元素都是一个向量，对应于data frame的一个列, data frame和数据库里的表类似.  
+# Data Type
+**vector** 每个元素的mode（数据类型）要一致, 单个数字、字符串都是长度为 1 的向量.
+**matrix** 是附带了两个属性的向量，行数和列数.
+**list** 是不要求类型一致的 vector.
+**data frame** 是list，这种list每个元素都是一个向量，对应于data frame的一个列, data frame和数据库里的表类似.
 
 ## Vector
 R程序的 **向量化(vectorized)** 能极大提高效率, 向量化就是尽量转换成对向量进行操作, 少使用循环.
@@ -90,7 +90,7 @@ x <- c(x[1:3],168,x[4])
 
 负号表示排除
 ```
-x[-c(1,3)] 
+x[-c(1,3)]
 ```
 
 若 y 没有事先生成, 直接如下面这样是会报错的, 这是因为 R 的函数是编程的特点, 关于向量元素的读写事实上是通过函数实现的, 若不事先知道 y 的类型, 该函数就无法操作.
@@ -214,7 +214,7 @@ class(y[1,, drop=FALSE])
 [ 是一个函数
 ```{r}
 # 下面等价于 y[2,1]
-"["(y,2,1) 
+"["(y,2,1)
 ```
 
 可以给行列赋值
@@ -323,7 +323,7 @@ table()
 dimnames()
 
 # 调用函数, 第一个参数函数名, 第二个参数是list, 其中每个元素是要传给执行函数的参数
-do.call(fun,arg)    
+do.call(fun,arg)
 ```
 
 # R 程序结构
@@ -356,7 +356,7 @@ closure 包含函数的参数和主体以及他的执行环境(with its environm
 
 这行命令奇怪的地方在于将值赋给一个函数的返回值
 ```{r}
-names(x) <- c("a","b","ab")  
+names(x) <- c("a","b","ab")
 x
 ```
 其实它真正调用的是这个函数
@@ -376,7 +376,7 @@ u <- "g<-"(u,value=v)
 
 # 函数的使用
 
-## 函数：paste 
+## 函数：paste
 作用：拼接字符串
 sep 是向量同位置的分隔符，collapse 是向量各分量的分隔符
 ```{r paste}
@@ -398,7 +398,7 @@ paste0("A", 1:6, collapse = ",")
 diff(1:10, differences = 2)
 diff(diff(1:10))
 # 看函数自带的例子
-example("diff") 
+example("diff")
 ```
 
 ## 函数：sub
@@ -451,7 +451,7 @@ scan() 可以从文件或者终端上读入内容, 不带 what 默认使用数�
 
 readline() 从键盘读入单行.
 
-print()     
+print()
 cat() 这个函数更适合输出
 ```{r}
 x <- 1:3
@@ -468,7 +468,7 @@ seek(conn=c,where=0)  让connectino从头开始寻找.
 
 read.table() 和 scan() 函数可以接收网址为参数.
 
-文件和文件夹相关函数: 
+文件和文件夹相关函数:
 
 * file.info()
 * dir()
@@ -485,13 +485,13 @@ read.table() 和 scan() 函数可以接收网址为参数.
 * socketSelect() : This is useful when a server is connected to multiple clients. Its main argument, socklist , is a list of connections, and its return value is the sublist of connections that have data ready for the server to read.
 
 # R 的性能
-R is an interpreted language, 会话中的对象都存储在内存中. 
+R is an interpreted language, 会话中的对象都存储在内存中.
 
-在 Windows 下, 可以通过 memory.size(NA) 或者 memory.limit() 函数来查看分配给 R 的内存大小, 通过 memory.size(F) 查看当前 R 已使用的内存, memory.size(T) 查看已分配的内存, 刚开始时已使用内存和已分配内存是同步增加的, 但是随着 R 中的垃圾被清理, 已使用内存会减少, 而已分配给R的内存一般不会改变. 可以通过 memory.limit(size= 2000) 来指定可分配的最大内存数, 单位 MB. 
+在 Windows 下, 可以通过 memory.size(NA) 或者 memory.limit() 函数来查看分配给 R 的内存大小, 通过 memory.size(F) 查看当前 R 已使用的内存, memory.size(T) 查看已分配的内存, 刚开始时已使用内存和已分配内存是同步增加的, 但是随着 R 中的垃圾被清理, 已使用内存会减少, 而已分配给R的内存一般不会改变. 可以通过 memory.limit(size= 2000) 来指定可分配的最大内存数, 单位 MB.
 
 在类 Unix 系统中, R 的内存显示是通过 shell 里的对单个进程的限制来控制的, 一般是 shell 里的 limit 或者 ulimit 命令来控制的.
 
-write R code faster: 
+write R code faster:
 
 * 通过向量化 vectorization, 用字节码use of byte-code compilation, and other approaches
 * 把核心的, 高CPU使用的代码部分用 C/C++ 实现
@@ -538,13 +538,13 @@ out of memory 内存不够用的解决办法(除了提高服务器内存这个�
 * 分块 chunking, 比如在 read.table() 中用skip来实现;
 * 用现有的包, RMySQL 做数据处理和存储, 用 biglm 做大数据的回归分析, ff和bigmemory包有自己的内存管理, 前者将大数据存在硬盘上, bigmemory更灵活不仅能存在硬盘还能存在主存上(in then machine's main memory, which is ideal for multicore machines);
 
-rm() 用来删除对象, 只会先删除对象的引用, 并不会马上清理对象占据的内存, 失去引用的空间就成了内存中的垃圾, R 在一段时间内会自动发现垃圾并集中清理, 也可以通过运行垃圾回收函数 gc() 来手动触发, 但是一般情况下没这个必要. 
+rm() 用来删除对象, 只会先删除对象的引用, 并不会马上清理对象占据的内存, 失去引用的空间就成了内存中的垃圾, R 在一段时间内会自动发现垃圾并集中清理, 也可以通过运行垃圾回收函数 gc() 来手动触发, 但是一般情况下没这个必要.
 
-R中的对象（比如矩阵）在内存中存于两种不同的地方, 一种是堆内存（heap）, 其基本单元是“Vcells”, 每个大小为8字节, 新来一个对象就会申请一块空间, 把值全部存在这里, 和C里面的堆内存很像. 第二种是地址对（cons cells）, 和LISP里的cons cells道理一样, 主要用来存储地址信息, 最小单元一般在32位系统中是28字节、64位系统中是56字节. 在R中, 可以通过ls()来查看当前所有对象名, 对于每一个对象, 可以通过object.size(x)来查看其占用内存的大小. 
+R中的对象（比如矩阵）在内存中存于两种不同的地方, 一种是堆内存（heap）, 其基本单元是“Vcells”, 每个大小为8字节, 新来一个对象就会申请一块空间, 把值全部存在这里, 和C里面的堆内存很像. 第二种是地址对（cons cells）, 和LISP里的cons cells道理一样, 主要用来存储地址信息, 最小单元一般在32位系统中是28字节、64位系统中是56字节. 在R中, 可以通过ls()来查看当前所有对象名, 对于每一个对象, 可以通过object.size(x)来查看其占用内存的大小.
 
-如果是因为当前对象占用内存过多, 那么可以通过处理对象来获取更大的可用内存. 一个很有用的方法是改变对象的存储模式, 通过storage.mode（x）可以看到某个对象的存储模式, 比如某个矩阵默认就是“double”的, 如果这个矩阵的数值都是整数甚至0-1, 完全没必要使用double来占用空间, 可以使用storage.mode(x） <- "integer"将其改为整数型, 可以看到该对象的大小会变为原来的一半. 
+如果是因为当前对象占用内存过多, 那么可以通过处理对象来获取更大的可用内存. 一个很有用的方法是改变对象的存储模式, 通过storage.mode（x）可以看到某个对象的存储模式, 比如某个矩阵默认就是“double”的, 如果这个矩阵的数值都是整数甚至0-1, 完全没必要使用double来占用空间, 可以使用storage.mode(x） <- "integer"将其改为整数型, 可以看到该对象的大小会变为原来的一半.
 
-R中矩阵的维度并不需要赋一个固定的值（很多语言的数组长度不能为变量）, 这为写程序带来了极大的方便, 因此经常在循环中会出现某个矩阵越来越长的情况, 实际上, 矩阵每增长一次, 即使赋给同名的变量, 都需要新开辟一块更大的空间, 假设初始矩阵为100K, 第二个为101K, 一直增到120K, 那么, 将会分别开辟100K、101K一直到120K的连续堆内存, 如果一开始就开一块120K的, 使之从101K逐渐增长到120K, 将会大大地节约内存. 
+R中矩阵的维度并不需要赋一个固定的值（很多语言的数组长度不能为变量）, 这为写程序带来了极大的方便, 因此经常在循环中会出现某个矩阵越来越长的情况, 实际上, 矩阵每增长一次, 即使赋给同名的变量, 都需要新开辟一块更大的空间, 假设初始矩阵为100K, 第二个为101K, 一直增到120K, 那么, 将会分别开辟100K、101K一直到120K的连续堆内存, 如果一开始就开一块120K的, 使之从101K逐渐增长到120K, 将会大大地节约内存.
 
 # 关于 Object-Oriented
 http://adv-r.had.co.nz/OO-essentials.html
@@ -576,7 +576,7 @@ methods(print)
 ```
 得到的结果中有类似 print.aspell* 这样带星号的实现, 表明它是不可见的函数(nonvisible functions), 即它不在默认的命名空间(namespace)中, 这时可以用如下函数来得到该函数所在的命名空间 utils, 引用方式为 utils:::print.aspell(aspout)
 ```{r}
-getAnywhere(print.aspell) 
+getAnywhere(print.aspell)
 ```
 
 *RC(Reference Classes)* 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect("blue"). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place
