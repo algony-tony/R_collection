@@ -113,9 +113,5 @@ dcast(aql, month ~ variable, fun.aggregate = mean,
 ```
 
 
-
 参考:
 1. [An Introduction to reshape2](http://seananderson.ca/2013/10/19/reshape.html)
-
-
-

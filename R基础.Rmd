@@ -447,6 +447,9 @@ strsplit("6-16-2011",split="-")
 
 ## I/O 函数
 
+### 函数: scan
+scan 读取数据向量, 也即是数据都有相同的类型, 要么都是数值, 要么都是字符串, 每个元素都用一个或多个空格分隔开, 或者通过参数 sep 指定分隔符. 如果 scan 的第一个参数是文件, 则从该文件中读取数据, 如果第一个参数是空白, 则从终端中读取数据, 以一个完全的空白行为结束符. scan 默认读取的是数值, 如果想要读取字符串则要指定 what="" 参数.
+
 scan() 可以从文件或者终端上读入内容, 不带 what 默认使用数字和double类型, 如果是字符串就需要指定 what="", scan("filename",what=""), 直接用 scan("") 则从键盘输入.
 
 readline() 从键盘读入单行.
@@ -667,3 +670,4 @@ edit()
 
 参考:
 1. The Art of R Programming
+2. [Reading Data into R](http://www.stat.berkeley.edu/~spector/s133/Read)
