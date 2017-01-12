@@ -450,7 +450,7 @@ scan 读取的结果是一个向量值, 也即是都有相同的类型的数据,
 
 scan 可以结合其他函数来生成多维的数据, 比如结合 matrix 使用来生成矩阵.
 ```{r scan01}
-cat("./data/mat.dat")
+scan("./data/mat.dat")
 mymat <- matrix(scan("./data/mat.dat"), ncol=4, byrow=TRUE)
 mymat
 ```
