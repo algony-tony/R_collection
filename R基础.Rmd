@@ -452,7 +452,7 @@ scan 可以结合其他函数来生成多维的数据, 比如结合 matrix 使�
 ```{r scan01}
 cat("./data/mat.dat")
 mymat <- matrix(scan("./data/mat.dat"), ncol=4, byrow=TRUE)
-mycat
+mymat
 ```
 
 readline() 从键盘读入单行.
