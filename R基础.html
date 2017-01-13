@@ -144,6 +144,9 @@ $(document).ready(function () {
 <li><a href="#-repeat">函数: repeat</a></li>
 <li><a>字符串处理函数</a></li>
 <li><a href="#-scan">函数: scan</a></li>
+<li><a href="#-read.">函数: read.*</a></li>
+<li><a href="#-count.fields">函数: count.fields</a></li>
+<li><a href="#-readlines">函数: readLines</a></li>
 <li><a href="#-io-">其他一些 I/O 函数</a></li>
 </ul></li>
 <li><a href="#r-">R 的性能</a></li>
@@ -660,12 +663,38 @@ substr(&quot;abcdefg&quot;,3,5)</code></pre>
 <h2>函数: scan</h2>
 <p>scan 读取的结果是一个向量值, 也即是都有相同的类型的数据, 要么都是数值, 要么都是字符串, 每个元素都用一个或多个空格分隔开, 或者通过参数 sep 指定分隔符. 如果 scan 的第一个参数是文件, 则从该文件中读取数据, 如果第一个参数是空白, 则从终端中读取数据, 以一个完全的空白行为结束符. scan 默认读取的是数值, 如果想要读取字符串则要指定 what=“” 参数.</p>
 <p>scan 可以结合其他函数来生成多维的数据, 比如结合 matrix 使用来生成矩阵.</p>
-<pre class="r"><code>cat(&quot;./data/mat.dat&quot;)</code></pre>
-<pre><code>## ./data/mat.dat</code></pre>
-<pre class="r"><code>mymat &lt;- matrix(scan(&quot;./data/mat.dat&quot;), ncol=4, byrow=TRUE)
+<pre class="r"><code>scan(&quot;data/mat.dat&quot;)</code></pre>
+<pre><code>##  [1]  7 19 12 15  8  9 17  4 52 12  9  7 12  9 40 13</code></pre>
+<pre class="r"><code>mymat &lt;- matrix(scan(&quot;data/mat.dat&quot;), ncol=4, byrow=TRUE)
 mymat</code></pre>
-<pre><code>##      [,1] [,2] [,3] [,4]</code></pre>
-<p>readline() 从键盘读入单行.</p>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    7   19   12   15
+## [2,]    8    9   17    4
+## [3,]   52   12    9    7
+## [4,]   12    9   40   13</code></pre>
+</div>
+<div id="-read." class="section level2">
+<h2>函数: read.*</h2>
+<p>read.table, read.csv, read.csv2, read.delim, read.delim2 这些 read.* 函数读取出来是 data frame. 其中 read.table 是基础函数, 其他几个就是对这个函数设置了一些默认值, 带2的函数是对一些地方使用逗号做小数点, 分号做列分隔来用的, 我们一般较少使用.</p>
+<p>1 read.csv 默认设置 header = TRUE, sep=“,”, quote = “&quot;”, dec = “.”, fill =TRUE; 2 read.csv2 默认设置 header = TRUE, sep=“;”, quote = “&quot;”, dec = “,”, fill =TRUE; 3 read.delim 默认设置 header = TRUE, sep=“”, quote = “&quot;”, dec = “.”, fill =TRUE; 4 read.delim2 默认设置 header = TRUE, sep=“”, quote = “&quot;”, dec = “,”, fill =TRUE;</p>
+</div>
+<div id="-count.fields" class="section level2">
+<h2>函数: count.fields</h2>
+<p>这个是拿来计算读入数据中每行的列数, 一般在前期做数据检查的时候使用到.</p>
+<pre class="r"><code>flds &lt;- count.fields(&quot;data/mat.dat&quot;)
+flds</code></pre>
+<pre><code>## [1] 4 4 4 4</code></pre>
+<pre class="r"><code>table(flds)</code></pre>
+<pre><code>## flds
+## 4 
+## 4</code></pre>
+</div>
+<div id="-readlines" class="section level2">
+<h2>函数: readLines</h2>
+<p>readLines 从名字看出就是把数据当做文本一行一行读入, 不尝试对列做分隔, 比如读入网页的内容就是一行一行的文本, 就可以使用 readLines 函数. 还可以通过结合 strsplit 和 readLines 函数来对数据做一些复杂的列分隔, 因为上面的 read.table 函数的分隔符只支持一个字符. readLines 可以通过结合参数 n 来选择读取的行数. 函数 readline 就是只会读取一行.</p>
+</div>
+<div id="-io-" class="section level2">
+<h2>其他一些 I/O 函数</h2>
 <p>print() cat() 这个函数更适合输出</p>
 <pre class="r"><code>x &lt;- 1:3
 x</code></pre>
@@ -679,8 +708,20 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <pre><code>## 5.12.13.8
 ## 88</code></pre>
 <p>连接(connection)在用函数 file(),url() 等的时候就会被创建, 用 ?connection 可以查看使用连接的函数, close() 用来关闭连接.</p>
-<p>seek(conn=c,where=0) 让connectino从头开始寻找.</p>
-<p>read.table() 和 scan() 函数可以接收网址为参数.</p>
+<p>textConnection 可以将少量的数据插入一个连接中, 使用起来就像是在操作一个文件, 在做数据演示的时候可以使用上.</p>
+<pre class="r"><code>thedata = textConnection('7 19 12 15
+8 9 17 4
+52 12 9 7
+12 9 40 13
+')
+mymat = matrix(scan(thedata),ncol=4,byrow=TRUE)
+mymat</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    7   19   12   15
+## [2,]    8    9   17    4
+## [3,]   52   12    9    7
+## [4,]   12    9   40   13</code></pre>
+<p>seek(conn=c,where=0) 让connection从头开始寻找.</p>
 <p>文件和文件夹相关函数:</p>
 <ul>
 <li>file.info()</li>
@@ -689,9 +730,6 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <li>getwd()</li>
 <li>?files 查看和文件相关的函数</li>
 </ul>
-</div>
-<div id="-io-" class="section level2">
-<h2>其他一些 I/O 函数</h2>
 <p>一些更底层的 I/O 函数:</p>
 <ul>
 <li>readLines() and writeLines() : These allow you to program as if TCP/IP were sending messages line by line, even though this is not actually the case. If your application is naturally viewed in terms of lines, these two functions can be quite handy.</li>
@@ -718,21 +756,21 @@ cat(x,sep=c(&quot;.&quot;,&quot;.&quot;,&quot;.&quot;,&quot;\n&quot;,&quot;\n&qu
 <p><strong>copy-on-change</strong> 一开始 y 和 z 共享一个内存地址, 如果有一个值发生变化, 则复制到新地址重新赋值.</p>
 <pre class="r"><code>z &lt;- runif(10)
 z</code></pre>
-<pre><code>##  [1] 0.009829373 0.886891525 0.646516448 0.532102002 0.123879140
-##  [6] 0.936490890 0.934570308 0.230844050 0.940006028 0.548966866</code></pre>
+<pre><code>##  [1] 0.5190085 0.6256218 0.0955412 0.8408416 0.1908323 0.5014035 0.7530136
+##  [8] 0.6307504 0.8536809 0.3161694</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x38af428&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x35c0e48&gt;&quot;</code></pre>
 <pre class="r"><code>y &lt;- z
 tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x38af428&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x35c0e48&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x38af428&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x35c0e48&gt;&quot;</code></pre>
 <pre class="r"><code>y[3] &lt;- 8</code></pre>
-<pre><code>## tracemem[0x38af428 -&gt; 0x39fcd88]: eval eval withVisible withCallingHandlers handle timing_fn evaluate_call evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
+<pre><code>## tracemem[0x35c0e48 -&gt; 0x3650f78]: eval eval withVisible withCallingHandlers handle timing_fn evaluate_call evaluate in_dir block_exec call_block process_group.block process_group withCallingHandlers process_file &lt;Anonymous&gt; &lt;Anonymous&gt;</code></pre>
 <pre class="r"><code>tracemem(z)</code></pre>
-<pre><code>## [1] &quot;&lt;0x38af428&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x35c0e48&gt;&quot;</code></pre>
 <pre class="r"><code>tracemem(y)</code></pre>
-<pre><code>## [1] &quot;&lt;0x39fcd88&gt;&quot;</code></pre>
+<pre><code>## [1] &quot;&lt;0x3650f78&gt;&quot;</code></pre>
 <pre class="r"><code>untracemem(z)
 untracemem(y)</code></pre>
 <p>R 内部的内存复制是通过调用 duplicate() 函数来实现的(新版的R叫duplicate1()).</p>
@@ -980,7 +1018,7 @@ methods(print)</code></pre>
 ##         writeLines(paste(format(x, ...), collapse = &quot;\n\n&quot;))
 ##     invisible(x)
 ## }
-## &lt;bytecode: 0x3287fd0&gt;
+## &lt;bytecode: 0x28fbd08&gt;
 ## &lt;environment: namespace:utils&gt;</code></pre>
 <p><em>RC(Reference Classes)</em> 不同于 S3 和 S4, RC 是采用消息传递的 OO, 所以方法是属于类的, 而不是属于函数. 用 $ 来区分类和方法, 调用方式如下: canvas$drawRect(“blue”). RC 也是多变的, 因为他不采用 R 通常的 copy-on-modify 方式(即在修改一个对象时会先拷贝到一个新地址再做修改), 而是采用 modified in place</p>
 <p><em>base types</em> 内部 C 语言层级的类型, 是其他 OO 系统的基石(building blocks). 通常这些基础类型通过 C 语言操作.</p>
